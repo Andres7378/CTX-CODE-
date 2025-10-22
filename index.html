@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="format-detection" content="telephone=yes">
+  <title>CTX Grill Degreaser – El mejor desengrasante para tu parrilla</title>
+  <meta name="description" content="Un sitio vivo e interactivo para CTX Grill Degreaser. Apunta y elimina la grasa (bacterias) con tu cursor en forma de botella CTX." />
+  <meta name="theme-color" content="#FF008C" />
+  <!-- Social -->
+  <meta property="og:title" content="CTX Grill Degreaser – Spray. Aim. Clean." />
+  <meta property="og:description" content="Explora el poder cítrico de CTX en una experiencia web jugable." />
+  <meta property="og:type" content="website" />
+
+  <!-- Web fonts (alternativas web a Futura) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0b0f;
+      --panel:#151620;     
+      --ink:#ffffff;
+      --muted:#cfd3da;
+      --primary:#FF008C;   /* CTX pink */
+      --citrus:#FFD166;    /* citrus spark */
+      --acid:#00D1B2;      /* minty clean accent */
+      --alert:#F24E1E;     /* warm orange */
+      --radius:18px;
+      --shadow:0 14px 40px rgba(0,0,0,.45);
+      --maxw:1200px;
+    }
+
+    *,*:before,*:after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(1200px 600px at 85% -10%, rgba(255,0,140,.16), transparent),var(--bg);color:var(--ink);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;line-height:1.6}
+    h1,h2,h3{font-family:Montserrat, Inter, system-ui, sans-serif;line-height:1.15;margin:0 0 .5rem}
+    h1{font-size:clamp(2.2rem,6vw,4rem);letter-spacing:.2px}
+    h2{font-size:clamp(1.6rem,3.5vw,2.3rem)}
+    p{margin:0 0 1rem;color:var(--muted)}
+    a{color:inherit;text-decoration:none}
+
+    .container{width:min(100%,var(--maxw));margin-inline:auto;padding:24px}
+
+    header{position:sticky;top:0;z-index:40;background:rgba(11,11,15,.45);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800}
+
+    /* Logo img */
+    .logo-img{
+      height:34px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+    }
+
+    .btn{--bg:var(--primary);--fg:#fff;display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 1.1rem;border-radius:999px;background:var(--bg);color:var(--fg);border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 26px rgba(255,0,140,.3);font-weight:600;transition:transform .15s ease, box-shadow .2s ease, background .2s ease; cursor:pointer}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,0,140,.38)}
+    .btn.ghost{--bg:transparent;--fg:var(--ink);border-color:rgba(255,255,255,.18);box-shadow:none}
+    .btn.alt{--bg:var(--acid);box-shadow:0 8px 26px rgba(0,209,178,.28)}
+
+    .hero{position:relative;isolation:isolate}
+    .hero-grid{display:grid;grid-template-columns: 480px 1fr;gap:24px;align-items:center;min-height:70vh}
+    .kicker{color:var(--citrus);font-weight:600;text-transform:uppercase;letter-spacing:.6px;font-size:.9rem}
+    .lead{font-size:clamp(1rem,1.4vw,1.125rem)}
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+    .playcard{position:relative;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-height:420px}
+    canvas#arena{display:block;width:100%;height:100%}
+    .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:12px}
+    .badge{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.12);padding:.4rem .7rem;border-radius:999px;font-weight:600}
+    .hud .right{display:flex;gap:8px}
+    .restart{pointer-events:auto}
+
+    .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+    .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+
+    .showcase{margin-top:48px;background:linear-gradient(135deg, rgba(255,209,102,.06), transparent 30%), radial-gradient(900px 400px at 10% -10%, rgba(0,209,178,.12), transparent 60%), var(--bg)}
+    .gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .tile{grid-column: span 6;background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:20px;min-height:200px;padding:16px;display:grid;place-items:center;box-shadow:var(--shadow)}
+    .tile.large{grid-column: span 12;min-height:280px}
+
+    /* Fancy doc tiles */
+    .tile.doc{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.14);transition:transform .2s ease, box-shadow .25s ease, border-color .25s ease}
+    .tile.doc::before{content:'PDF';position:absolute;top:14px;left:14px;font-size:.75rem;letter-spacing:.6px;font-weight:800;padding:.25rem .5rem;border-radius:999px;background:color-mix(in srgb, var(--accent) 24%, transparent);border:1px solid color-mix(in srgb, var(--accent) 60%, white 0%) }
+    .tile.doc::after{content:'';position:absolute;inset:-2px;border-radius:20px;background:conic-gradient(from var(--sh,0deg), var(--accent), transparent 40%);opacity:.28;filter:blur(24px);pointer-events:none;transition:opacity .3s ease, transform .3s ease;transform:scale(1.04)}
+    .tile.doc:hover{transform:translateY(-2px) scale(1.01);box-shadow:0 16px 44px rgba(0,0,0,.55);border-color:color-mix(in srgb, var(--accent) 40%, white 0%)}
+    .tile.doc:hover::after{opacity:.55;--sh:260deg}
+    .tile.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .doc-es{--accent:#FF008C}
+    .doc-en{--accent:#00D1B2}
+
+    footer{padding:40px 0 64px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted)}
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+    @media (max-width:1000px){
+      .hero-grid{grid-template-columns:1fr;min-height:auto}
+      .panels{grid-template-columns:1fr}
+      .tile{grid-column:span 12}
+    }
+
+    /* Removed default SVG cursor: JS sets the CTX bottle cursor after chroma-key processing */
+
+    /* Sheet (tab) */
+    .sheet{position:fixed;inset:auto 0 0 0;background:linear-gradient(180deg,#0f0f14 0%,#0b0b0f 100%);border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -10px 50px rgba(0,0,0,.5);transform:translateY(105%);transition:transform .35s ease;z-index:60;border-top:1px solid rgba(255,255,255,.08)}
+    .sheet[aria-hidden="false"]{transform:translateY(0)}
+    .sheet__backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:-1}
+    .sheet[aria-hidden="false"] .sheet__backdrop{opacity:1;pointer-events:auto}
+    .sheet__content{padding:18px 24px 28px}
+    .sheet__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .benefits{display:grid;gap:.8rem;margin:0;padding-left:1.1rem}
+    .benefits li{color:var(--muted);list-style:none;position:relative;padding-left:1.6rem}
+    .benefits li:before{content:"✔";position:absolute;left:0;top:0;color:var(--acid);font-weight:800}
+    .sheet__close{--bg:transparent;border-color:rgba(255,255,255,.18)}
+    body.no-scroll{overflow:hidden}
+
+    /* Sticky CTA (mobile) */
+    .sticky-cta{position:fixed;left:0;right:0;bottom:12px;display:none;z-index:50}
+    .sticky-cta .wrap{margin:auto;max-width:var(--maxw);padding:0 16px;display:flex;gap:8px;justify-content:center}
+    .sticky-cta .btn{padding:.9rem 1.2rem}
+    @media (max-width:820px){ .sticky-cta{display:block} }
+
+    /* simple reveal */
+    .reveal{opacity:0;transform:translateY(8px);transition:opacity .4s ease, transform .4s ease}
+    .reveal.in{opacity:1;transform:none}
+
+    /* FLAGS for the language button */
+    .btn .flag { display:inline-block; width:18px; height:12px; border-radius:2px; overflow:hidden; box-shadow:0 0 0 1px rgba(255,255,255,.2) inset; }
+    .btn .flag svg { display:block; width:100%; height:100%; }
+    .btn .label { line-height:1; }
+
+    /* Tiny toast for desktop tel/sms fallback */
+    .toast{
+      position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+      background:#16171f; color:#fff; border:1px solid rgba(255,255,255,.12);
+      padding:.6rem .9rem; border-radius:999px; z-index:1000; box-shadow:var(--shadow);
+      font-weight:600; opacity:0; transition:.25s ease; pointer-events:none;
+    }
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav" role="navigation" aria-label="Principal">
+      <a href="#top" class="brand" aria-label="Inicio">
+        <!-- Correct logo from your Imgur -->
+        <img src="https://i.imgur.com/n6Yk0yQ.png" alt="CTX Grill Degreaser" class="logo-img" />
+        <span>Grill Degreaser</span>
+      </a>
+      <nav class="nav-links" aria-label="Secciones">
+        <a class="btn ghost" href="#juega" id="navPlay">Jugar</a>
+        <button class="btn ghost" id="beneficiosBtn" type="button">Beneficios</button>
+        <a class="btn ghost" href="#docs" id="navDocs">Fichas</a>
+        <!-- Language button gets replaced by JS (with Spain/US flags) -->
+        <button class="btn ghost" id="langToggle" type="button" aria-label="Cambiar idioma">EN</button>
+        <a class="btn alt" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener" id="navBuy">Comprar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO + GAME -->
+    <section class="container hero" id="juega" aria-labelledby="t1">
+      <div class="hero-grid">
+        <div>
+          <div class="kicker" id="kicker">El mejor desengrasante para tu parrilla</div>
+          <h1 id="t1">Apunta. Spray. <span style="color:var(--primary)">Limpia.</span></h1>
+          <p class="lead" id="lead">¡Limpieza Profesional para Tu Parrilla, al Alcance de un Spray!<br>El poder cítrico que elimina grasa al instante. Seguro, ecológico y listo para usar.</p>
+          <div class="cta-row" role="group" aria-label="Acciones principales">
+            <a class="btn" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener" id="btnBuyNow">Cómpralo ahora</a>
+            <button class="btn ghost" type="button" data-open-beneficios id="btnBenefits">Ver beneficios</button>
+            <a class="btn ghost" href="#arena-wrap" onclick="window.startGame && window.startGame()" id="btnStart">Comenzar juego</a>
+          </div>
+          <p class="sr-only" id="game-hint">Usa el cursor como botella de spray. Mantén presionado para rociar y eliminar bacterias.</p>
+        </div>
+
+        <div id="arena-wrap" class="playcard" aria-describedby="game-hint">
+          <canvas id="arena" aria-label="Arena interactiva para eliminar bacterias"></canvas>
+          <div class="hud">
+            <div class="badge" id="score">Kills: 0</div>
+            <div class="right">
+              <div class="badge" id="timer">00:10</div>
+              <button class="btn restart" id="restartBtn" aria-label="Reiniciar">Reiniciar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panels" id="beneficios" aria-label="Beneficios y usos">
+        <article class="panel"><h3 id="p1t">🔥 Limpieza Profunda</h3><p id="p1b">Penetra y emulsifica grasas y aceites para un enjuague sin esfuerzo.</p></article>
+        <article class="panel"><h3 id="p2t">🍊 Poder Cítrico</h3><p id="p2b">Fórmula segura y eficiente para uso doméstico o profesional.</p></article>
+        <article class="panel"><h3 id="p3t">🧽 Fácil de Usar</h3><p id="p3b">Rocía, espera 5–15 min, cepilla y enjuaga. ¡Listo!</p></article>
+      </div>
+    </section>
+
+    <!-- BENEFICIOS: sheet dentro de la página -->
+    <div id="beneficiosSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="beneficiosTitle" aria-hidden="true">
+      <div class="sheet__backdrop" data-close-beneficios></div>
+      <div class="sheet__content container">
+        <div class="sheet__header">
+          <h2 id="beneficiosTitle">Beneficios de CTX Grill Degreaser</h2>
+          <button class="btn ghost sheet__close" id="closeBeneficios" aria-label="Cerrar beneficios">Cerrar</button>
+        </div>
+        <ul class="benefits">
+          <li class="reveal" style="--d:40ms"><strong>Limpieza profunda y potente:</strong> Especialmente formulado para la limpieza intensiva y el mantenimiento diario de parrillas, sartenes y utensilios de cocina.</li>
+          <li class="reveal" style="--d:120ms"><strong>Fórmula ecológica:</strong> A base de agua y libre de COV, plomo y metales pesados.</li>
+          <li class="reveal" style="--d:200ms"><strong>Desengrasado rápido y eficaz:</strong> Penetra en las superficies para eliminar grasa, aceite y residuos de alimentos. El <em>indicador de color</em> incorporado se vuelve blanco al contacto con la grasa para una confirmación visual rápida.</li>
+          <li class="reveal" style="--d:280ms"><strong>Fresco aroma cítrico:</strong> El aroma a toronja mantiene tu cocina limpia y fresca después de cada uso.</li>
+          <li class="reveal" style="--d:360ms"><strong>Uso versátil:</strong> Perfecto para parrillas, herramientas de parrilla, sartenes y otras superficies grasosas. Seguro para ti, tus superficies y el medio ambiente.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- GALERÍA -->
+    <section class="showcase" aria-labelledby="galeria">
+      <div class="container">
+        <h2 id="galeria">Galería de contenido</h2>
+        <p class="muted" id="galeriaTxt">Videos destacados con tips de uso, demostraciones y antes/después. (Sustituye los archivos <code>assets/video*.mp4</code> por tus clips).</p>
+        <div class="gallery" style="margin-top:16px">
+          <div class="tile large">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@panzontogo/video/7551285276622982408" data-video-id="7551285276622982408" style="max-width: 780px; min-width: 288px; width:100%">
+              <section>
+                <a target="_blank" title="@panzontogo" href="https://www.tiktok.com/@panzontogo?refer=embed">@panzontogo</a>
+                Limpia tu asador con el nuevo CTX Grill Degreaser •
+                <a title="grill" target="_blank" href="https://www.tiktok.com/tag/grill?refer=embed">#grill</a>
+                <a title="asador" target="_blank" href="https://www.tiktok.com/tag/asador?refer=embed">#asador</a>
+                <a title="parrilla" target="_blank" href="https://www.tiktok.com/tag/parrilla?refer=embed">#parrilla</a>
+                <a title="carneasada" target="_blank" href="https://www.tiktok.com/tag/carneasada?refer=embed">#carneasada</a>
+                <a title="ctxgrilldegreaser" target="_blank" href="https://www.tiktok.com/tag/ctxgrilldegreaser?refer=embed">#ctxgrilldegreaser</a>
+              </section>
+            </blockquote>
+          </div>
+          <div class="tile">
+            <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DPxSDcHj9Cu/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:12px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:540px;min-width:326px;padding:0;width:100%"></blockquote>
+          </div>
+          <div class="tile">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@chefchristian.herrera/video/7548860447517166866" data-video-id="7548860447517166866" style="max-width: 780px; min-width: 288px; width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@chefchristian.herrera?refer=embed">@chefchristian.herrera</a></section>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script>(function(){
+      if(!document.querySelector('script[src*="tiktok.com/embed.js"]')){var s=document.createElement('script');s.async=true;s.src='https://www.tiktok.com/embed.js';document.body.appendChild(s);} 
+      if(!document.querySelector('script[src*="instagram.com/embed.js"]')){var s2=document.createElement('script');s2.async=true;s2.src='https://www.instagram.com/embed.js';document.body.appendChild(s2);} 
+    })();</script>
+
+    <!-- SOCIAL -->
+    <section class="showcase" aria-labelledby="social">
+      <div class="container">
+        <h2 id="social">Conéctate con nosotros</h2>
+        <p class="muted" id="socialTxt">Tips de limpieza, recetas y promociones exclusivas.</p>
+        <div class="gallery" style="margin-top:16px">
+          <div class="tile large">
+            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/ctxgrilldegreaser/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:12px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:780px;min-width:288px;padding:0;width:100%"></blockquote>
+          </div>
+          <div class="tile">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@ctxdegreaser" data-unique-id="ctxdegreaser" data-embed-type="creator" style="max-width: 780px; min-width: 288px; width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@ctxdegreaser?refer=creator_embed">@ctxdegreaser</a></section>
+            </blockquote>
+          </div>
+
+          <!-- Tel/SMS with desktop-safe fallback -->
+          <a class="tile" id="callTile" href="tel:+17138244385"><strong>Llamar / SMS</strong></a>
+          <a class="tile" id="smsTile" href="sms:+17138244385"><strong>Enviar SMS</strong></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOCS / BUY -->
+    <section class="container" aria-labelledby="docs" id="docs">
+      <h2 id="docsH2">Documentos técnicos</h2>
+      <p class="muted" id="docsTxt">Descarga las fichas con especificaciones, seguridad y recomendaciones de uso.</p>
+      <div class="gallery" style="margin-top:14px">
+        <a class="tile doc doc-es" href="https://blendergroup.com/storage/product/media/826/Ficha_Te__cnica.pdf" target="_blank" rel="noopener noreferrer" id="docEs">Ficha Técnica español</a>
+        <a class="tile doc doc-en" href="https://blendergroup.com/storage/product/media/827/Data_Sheet.pdf" target="_blank" rel="noopener noreferrer" id="docEn">Data Sheet english</a>
+        <a class="tile" href="mailto:apadilla@blendergroup.com?subject=CTX%20Grill%20Degreaser%20-%20Bulk%20Inquiry" id="distrib">Distribuidores</a>
+      </div>
+    </section>
+
+    <section class="container" id="comprar" aria-labelledby="buy">
+      <h2 id="buy">Compra CTX Grill Degreaser</h2>
+      <p class="muted" id="buyTxt">Disponible en canales oficiales y distribuidores autorizados.</p>
+      <div class="cta-row" style="margin-top:12px">
+        <a class="btn" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener" id="buyOnline">Comprar en línea</a>
+        <a class="btn ghost" href="#social" id="contactSales">Contactar ventas</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky CTA mobile -->
+  <div class="sticky-cta" aria-hidden="false">
+    <div class="wrap">
+      <a class="btn" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener" id="stickyBuy">Cómpralo ahora</a>
+      <button class="btn ghost" type="button" data-open-beneficios id="stickyBenefits">Ver beneficios</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="year"></span> CTX Grill Degreaser · Blender Group US.</p>
+      <p class="muted" id="footerDemo">Este sitio es una demo interactiva. Incluye modo accesible para usuarios con "reduced motion".</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">Número copiado: +1 (713) 824-4385</div>
+
+  <script>
+/* =================== GAME =================== */
+(function(){
+  const canvas = document.getElementById('arena');
+  const wrap   = document.getElementById('arena-wrap');
+  const scoreEl= document.getElementById('score');
+  const timerEl= document.getElementById('timer');
+  const restartBtn = document.getElementById('restartBtn');
+  let canStart = true;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let actx=null, gain=null, noiseSrc=null; let soundOn=true;
+
+  let ctx, W, H;
+  let bacteria=[], particles=[], confetti=[];
+  let spraying=false, score=0, time=10, raf, started=false, won=false, shine=0, t=0;
+  let state='idle';
+
+  const dirtCanvas = document.createElement('canvas');
+  const dirtCtx    = dirtCanvas.getContext('2d');
+
+  function resize(){
+    const rect = wrap.getBoundingClientRect();
+    const dpr  = Math.min(window.devicePixelRatio||1, 2);
+    W = Math.max(320, Math.floor(rect.width));
+    H = Math.max(260, Math.floor(rect.height));
+    canvas.width = W*dpr; canvas.height = H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    dirtCanvas.width=W; dirtCanvas.height=H; drawDirt();
+  }
+
+  function rand(a,b){ return Math.random()*(b-a)+a }
+
+  function drawGrillBackground(){
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'#1b1c20'); grad.addColorStop(.5,'#0f1013'); grad.addColorStop(1,'#1b1c20');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
+    for(let x=20; x<W; x+=80){
+      const g = ctx.createLinearGradient(x-4,0,x+12,0);
+      g.addColorStop(0,'#17181b'); g.addColorStop(.5,'#c8ccd3'); g.addColorStop(1,'#1a1b1f');
+      ctx.fillStyle = g; ctx.fillRect(x-4,0,16,H);
+      ctx.fillStyle = 'rgba(255,255,255,.15)';
+      for(let y=20;y<H;y+=80){ ctx.fillRect(x+2,y,2,2) }
+    }
+    ctx.globalAlpha = .08; ctx.fillStyle = '#fff';
+    for(let y=0;y<H;y+=36){ ctx.fillRect(0,y,W,1) }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawDirt(){
+    dirtCtx.clearRect(0,0,W,H);
+    dirtCtx.fillStyle = 'rgba(80,50,20,0.58)';
+    dirtCtx.fillRect(0,0,W,H);
+    for(let i=0;i<700;i++){
+      dirtCtx.fillStyle = `rgba(120,80,40,${rand(.05,.22)})`;
+      dirtCtx.beginPath(); dirtCtx.arc(rand(0,W),rand(0,H),rand(1,3.2),0,Math.PI*2); dirtCtx.fill();
+    }
+    dirtCtx.globalAlpha=.22; dirtCtx.fillStyle='#000';
+    for(let x=0;x<W;x+=90){ dirtCtx.fillRect(x,0,3,H) }
+    dirtCtx.globalAlpha=1;
+  }
+
+  function cleanAt(x,y,r=56){
+    dirtCtx.globalCompositeOperation='destination-out';
+    const g=dirtCtx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    dirtCtx.fillStyle=g; dirtCtx.beginPath(); dirtCtx.arc(x,y,r,0,Math.PI*2); dirtCtx.fill();
+    dirtCtx.globalCompositeOperation='source-over';
+  }
+
+  function spawnBacteria(n=10){
+    bacteria.length=0;
+    for(let i=0;i<n;i++){
+      const r=rand(16,28);
+      bacteria.push({
+        x:rand(r,W-r), y:rand(r,H-r), r,
+        vx:rand(-1.2,1.2), vy:rand(-1.2,1.2),
+        life:1, dead:false,
+        hue:rand(110,140), face:Math.floor(rand(0,3)),
+        wob:rand(0.06,0.12), phase:rand(0,Math.PI*2), lobes:Math.floor(rand(5,8)), blink:rand(0,1)
+      });
+    }
+  }
+
+  let mouse={x:0,y:0};
+  canvas.addEventListener('mousemove', e=>{ const r=canvas.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
+  canvas.addEventListener('mousedown', ()=>{ spraying=true; startSpray(); if(navigator.vibrate) navigator.vibrate(10); });
+  window.addEventListener('mouseup', ()=>{ spraying=false; stopSpray(); });
+  restartBtn.addEventListener('click', ()=> start(true));
+  canvas.addEventListener('click', ()=>{ if((state==='idle' || state==='won' || state==='lost') && canStart){ start(); } });
+
+  function spray(){ for(let i=0;i<8;i++) particles.push({x:mouse.x,y:mouse.y,vx:rand(2.2,4.2)*Math.cos(rand(-.6,.6)),vy:rand(2.2,4.2)*Math.sin(rand(-.6,.6)),life:1}); }
+
+  function drawBacteria(b){
+    ctx.save(); ctx.translate(b.x,b.y);
+    const k=b.lobes, r=b.r, amp=r*b.wob;
+    ctx.fillStyle = `hsl(${b.hue},80%,${b.dead?42:55}%)`;
+    ctx.beginPath();
+    for(let a=0;a<=Math.PI*2+0.001;a+=Math.PI/60){
+      const rad=r + Math.sin(a*k + b.phase + t*1.6)*amp;
+      const px=Math.cos(a)*rad, py=Math.sin(a)*rad;
+      if(a===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=`hsla(${b.hue},80%,30%,.6)`; ctx.lineWidth=1.4;
+    for(let i=0;i<4;i++){
+      const a=(i/4)*Math.PI*2 + b.phase;
+      const rad=r + Math.sin(a*k + t*1.4)*amp + 2;
+      const sx=Math.cos(a)*rad, sy=Math.sin(a)*rad;
+      ctx.beginPath(); ctx.moveTo(sx,sy);
+      ctx.quadraticCurveTo(sx+Math.cos(a)*8, sy+Math.sin(a)*8, sx+Math.cos(a)*14, sy+Math.sin(a)*14);
+      ctx.stroke();
+    }
+    const blinkOpen=(Math.sin(t*2 + b.blink*6)>-0.4);
+    const eyeR=r*0.16; ctx.fillStyle='rgba(0,0,0,.65)';
+    ctx.beginPath(); ctx.ellipse(-r*0.35,-r*0.15, eyeR, blinkOpen?eyeR:eyeR*0.2, 0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( r*0.35,-r*0.15, eyeR, blinkOpen?eyeR:eyeR*0.2, 0,0,Math.PI*2); ctx.fill();
+    ctx.lineWidth=Math.max(2,r*0.12); ctx.strokeStyle='#0b0b0f';
+    ctx.beginPath();
+    if(b.face===0){ ctx.arc(0, r*0.2, r*0.45, 0.1, Math.PI-0.1, false); }
+    else if(b.face===1){ ctx.moveTo(-r*0.4, r*0.28); ctx.quadraticCurveTo(0, r*(0.05+0.05*Math.sin(t*2)), r*0.4, r*0.28); }
+    else { const mR=r*(0.22+0.03*Math.sin(t*2)); ctx.arc(0, r*0.1, mR, 0, Math.PI*2); }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawShine(){
+    if(!won) return; shine += 6; const x=(shine % (W+300)) - 300;
+    const grad=ctx.createLinearGradient(x,0,x+200,H);
+    grad.addColorStop(0,'rgba(255,255,255,0)'); grad.addColorStop(.5,'rgba(255,255,255,.18)'); grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=grad; ctx.globalCompositeOperation='screen'; ctx.fillRect(x-50,0,260,H); ctx.globalCompositeOperation='source-over';
+  }
+
+  function update(){
+    t += 1/60;
+    ctx.clearRect(0,0,W,H);
+    drawGrillBackground();
+    ctx.drawImage(dirtCanvas,0,0);
+
+    for(const b of bacteria){ if(b.dead){ b.life -= .05; continue } b.x+=b.vx; b.y+=b.vy; if(b.x<b.r||b.x>W-b.r) b.vx*=-1; if(b.y<b.r||b.y>H-b.r) b.vy*=-1; }
+    if(spraying && !prefersReduced) spray();
+    for(const p of particles){ p.x+=p.vx; p.y+=p.vy; p.life-=.04; }
+    particles = particles.filter(p=>p.life>0);
+
+    for(const b of bacteria){ if(b.dead) continue; for(const p of particles){ const dx=b.x-p.x, dy=b.y-p.y; if(dx*dx+dy*dy < (b.r*b.r*.8)){ b.dead=true; score++; window.__score = score; scoreEl.textContent = (window.__scoreLabel || 'Kills') + ': ' + score; cleanAt(b.x,b.y, b.r*1.8); playPop(); break; } } }
+
+    for(const p of particles){ ctx.globalAlpha=Math.max(p.life,.1); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
+
+    for(const b of bacteria){ const a=b.dead?Math.max(b.life,0):1; if(a<=0) continue; ctx.globalAlpha=a; drawBacteria(b); ctx.globalAlpha=1; }
+
+    for(const c of confetti){ c.vy+=0.08; c.x+=c.vx; c.y+=c.vy; c.life-=.01; ctx.globalAlpha=Math.max(c.life,0); ctx.fillStyle=c.color; ctx.fillRect(c.x,c.y,c.w,c.h); }
+    confetti = confetti.filter(c=>c.life>0); ctx.globalAlpha=1;
+
+    drawShine();
+
+    if(started && !won){
+      time -= 1/60; if(time<0) time=0;
+      const alive = bacteria.some(b=>!b.dead);
+      if(!alive){ celebrate(); return; }
+      if(time===0){ endGame(); return; }
+    }
+    timerEl.textContent = '00:' + ('0'+Math.floor(time)).slice(-2);
+
+    raf = requestAnimationFrame(update);
+  }
+
+  function spawnConfetti(){ for(let i=0;i<140;i++){ confetti.push({x:rand(0,W), y:rand(-40,20), vx:rand(-1,1), vy:rand(0.5,2), w:rand(3,6), h:rand(6,12), color:`hsl(${rand(300,340)},90%,60%)`, life:1}); } }
+
+  function celebrate(){ state='won';
+    started=false; won=true; cancelAnimationFrame(raf);
+    canStart = false;
+    if(navigator.vibrate) navigator.vibrate([60,40,60]);
+    dirtCtx.clearRect(0,0,W,H); shine=0; particles=[]; spraying=false; stopSpray();
+    spawnConfetti(); playWin();
+    const msg=document.createElement('div'); msg.className='badge';
+    Object.assign(msg.style,{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',fontSize:'1.05rem',background:'rgba(0,0,0,.7)',pointerEvents:'auto',textAlign:'center'});
+    msg.innerHTML='<strong>¡Misión cumplida!</strong><br/>Bacterias y grasa eliminadas de la parrilla.<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">Jugar de nuevo</a>';
+    wrap.appendChild(msg);
+    window.startAgain=(e)=>{ e.preventDefault(); msg.remove(); start(true); };
+    raf = requestAnimationFrame(update);
+  }
+
+  function start(){
+    won=false; started=true; state='playing'; canStart=true; score=0; time=10; window.__score = 0; scoreEl.textContent = (window.__scoreLabel || 'Kills') + ': 0'; timerEl.textContent='00:10';
+    particles=[]; confetti=[]; spawnBacteria(10); drawDirt(); spraying=false; stopSpray();
+  }
+
+  function endGame(){ state='lost';
+    started=false; won=false; cancelAnimationFrame(raf); stopSpray();
+    const msg=document.createElement('div'); msg.className='badge';
+    Object.assign(msg.style,{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',fontSize:'1.05rem',background:'rgba(0,0,0,.7)',pointerEvents:'auto'});
+    msg.innerHTML='Se acabó el tiempo. <strong>'+score+'</strong> bacterias eliminadas. <a href="#" style="margin-left:6px" onclick="startAgain(event)">Reintentar</a>';
+    wrap.appendChild(msg);
+    window.startAgain=(e)=>{ e.preventDefault(); msg.remove(); start(); };
+    raf = requestAnimationFrame(update);
+  }
+
+  function init(){ resize(); spawnBacteria(8); update(); }
+  window.addEventListener('resize', resize);
+  window.startGame=()=>start();
+  init();
+
+  /* === CTX BOTTLE CURSOR (auto-remove white bg) === */
+  (function makeCursor(){
+    const src = "https://i.imgur.com/ow3h5Kt.png"; // your bottle image
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const s = 64; // cursor render size
+      const cnv = document.createElement('canvas');
+      cnv.width = s; cnv.height = s;
+      const c = cnv.getContext('2d');
+      // draw centered & scaled
+      const scale = Math.min(s/img.width, s/img.height);
+      const w = img.width * scale, h = img.height * scale;
+      c.drawImage(img, (s-w)/2, (s-h)/2, w, h);
+      // chroma key: make near-white transparent
+      const imgd = c.getImageData(0,0,s,s);
+      const d = imgd.data;
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i], g=d[i+1], b=d[i+2];
+        if(r>245 && g>245 && b>245){ d[i+3]=0; } // remove white
+      }
+      c.putImageData(imgd,0,0);
+      const url = cnv.toDataURL("image/png");
+      document.body.style.cursor = `url('${url}') 10 10, auto`;
+    };
+    img.onerror = ()=>{ /* fallback noop */ };
+    img.src = src;
+  })();
+
+  /* === Audio === */
+  function ensureAudio(){ if(actx) return; actx=new (window.AudioContext||window.webkitAudioContext)(); gain=actx.createGain(); gain.gain.value=0.25; gain.connect(actx.destination); }
+  function startSpray(){ if(!soundOn) return; ensureAudio(); stopSpray(); const buffer=actx.createBuffer(1, actx.sampleRate, actx.sampleRate); const data=buffer.getChannelData(0); for(let i=0;i<data.length;i++){ data[i]=Math.random()*2-1 } noiseSrc=actx.createBufferSource(); noiseSrc.buffer=buffer; const filt=actx.createBiquadFilter(); filt.type='highpass'; filt.frequency.value=1000; noiseSrc.connect(filt); filt.connect(gain); noiseSrc.loop=true; try{ noiseSrc.start(); }catch(e){} }
+  function stopSpray(){ if(!noiseSrc) return; try{ noiseSrc.stop(); }catch(e){} try{ noiseSrc.disconnect(); }catch(e){} noiseSrc=null; }
+  function playPop(){ if(!soundOn) return; ensureAudio(); const o=actx.createOscillator(); const g=actx.createGain(); o.type='sine'; o.frequency.setValueAtTime(600, actx.currentTime); o.frequency.exponentialRampToValueAtTime(120, actx.currentTime+0.12); g.gain.setValueAtTime(0.4, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.12); o.connect(g); g.connect(gain); o.start(); o.stop(actx.currentTime+0.13); }
+  function playWin(){ if(!soundOn) return; ensureAudio(); const o=actx.createOscillator(); const g=actx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(440, actx.currentTime); o.frequency.exponentialRampToValueAtTime(880, actx.currentTime+0.25); g.gain.setValueAtTime(0.5, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.4); o.connect(g); g.connect(gain); o.start(); o.stop(actx.currentTime+0.45); }
+  function playLose(){ if(!soundOn) return; ensureAudio(); const o=actx.createOscillator(); const g=actx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(200, actx.currentTime); o.frequency.linearRampToValueAtTime(80, actx.currentTime+0.3); g.gain.setValueAtTime(0.4, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.3); o.connect(g); g.connect(gain); o.start(); o.stop(actx.currentTime+0.32); }
+})();
+
+// footer year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* === Beneficios tab JS === */
+const beneficiosBtn = document.getElementById('beneficiosBtn');
+const beneficiosSheet = document.getElementById('beneficiosSheet');
+const closeBeneficios = document.getElementById('closeBeneficios');
+const beneficiosOpeners = document.querySelectorAll('[data-open-beneficios]');
+const beneficiosBackdrop = document.querySelector('.sheet__backdrop');
+
+function openBeneficios(){
+  beneficiosSheet.setAttribute('aria-hidden','false');
+  document.body.classList.add('no-scroll');
+  closeBeneficios?.focus();
+  beneficiosBtn?.classList.add('active');
+}
+function closeBeneficiosSheet(){
+  beneficiosSheet.setAttribute('aria-hidden','true');
+  document.body.classList.remove('no-scroll');
+  beneficiosBtn?.classList.remove('active');
+}
+beneficiosBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openBeneficios(); });
+closeBeneficios?.addEventListener('click', ()=> closeBeneficiosSheet());
+beneficiosBackdrop?.addEventListener('click', ()=> closeBeneficiosSheet());
+beneficiosOpeners.forEach(el=> el.addEventListener('click', (e)=>{ e.preventDefault(); openBeneficios(); }));
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && beneficiosSheet.getAttribute('aria-hidden')==='false'){ closeBeneficiosSheet(); }});
+// Open automatically if URL includes #beneficios without jumping
+if(location.hash === '#beneficios'){
+  try{ history.replaceState(null,'', location.pathname + location.search); }catch(e){}
+  openBeneficios();
+}
+
+/* === Scroll reveal === */
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) { document.querySelectorAll('.reveal').forEach(el=>{ el.classList.add('in'); }); return; }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
+    });
+  }, {root:null, rootMargin:'0px 0px -10% 0px', threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+})();
+
+/* === Desktop-safe tel/SMS fallback === */
+(function telSmsFallback(){
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const phone = "+17138244385";
+  const toast = document.getElementById('toast');
+  function showToast(){
+    toast.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(()=>toast.classList.remove('show'), 1800);
+  }
+  function copyPhone(){
+    navigator.clipboard?.writeText(phone).then(showToast).catch(showToast);
+  }
+  document.getElementById('callTile')?.addEventListener('click', (e)=>{
+    if(!isMobile){ e.preventDefault(); copyPhone(); }
+  });
+  document.getElementById('smsTile')?.addEventListener('click', (e)=>{
+    if(!isMobile){ e.preventDefault(); copyPhone(); }
+  });
+})();
+  </script>
+
+  <!-- ==== I18N toggle (ES <-> EN) ==== -->
+  <script>
+  (function(){
+    const html = document.documentElement;
+    const $ = (sel)=> document.querySelector(sel);
+
+    // Flags (inline SVG)
+    const US_FLAG = `
+      <svg viewBox="0 0 7410 3900" aria-hidden="true">
+        <path fill="#b22234" d="M0 0h7410v3900H0z"/>
+        <path stroke="#fff" stroke-width="300" d="M0 450h7410M0 1050h7410M0 1650h7410M0 2250h7410M0 2850h7410M0 3450h7410"/>
+        <path fill="#3c3b6e" d="M0 0h2964v2100H0z"/>
+        <g fill="#fff">
+          ${Array.from({length:9}).map((_,r)=>Array.from({length:r%2?5:6}).map((_,c)=>{
+            const x = 247 + c*494 + (r%2?247:0);
+            const y = 210 + r*210;
+            return `<g transform="translate(${x} ${y}) scale(7)"><polygon points="0,-6 1.9,-1.9 6,0 1.9,1.9 0,6 -1.9,1.9 -6,0 -1.9,-1.9"/></g>`;
+          }).join('')).join('')}
+        </g>
+      </svg>`;
+
+    /* Spain flag (not Mexico) */
+    const ES_FLAG = `
+      <svg viewBox="0 0 3 2" aria-hidden="true">
+        <rect width="3" height="2" fill="#AA151B"/>
+        <rect y="0.5" width="3" height="1" fill="#F1BF00"/>
+      </svg>`;
+
+    const map = {
+      es: {
+        title:'CTX Grill Degreaser – El mejor desengrasante para tu parrilla',
+        navPlay:'Jugar', navDocs:'Fichas', navBuy:'Comprar', btnLang:'EN',
+        kicker:'El mejor desengrasante para tu parrilla',
+        heroTitle:'Apunta. Spray. <span style="color:var(--primary)">Limpia.</span>',
+        lead:'¡Limpieza Profesional para Tu Parrilla, al Alcance de un Spray!<br>El poder cítrico que elimina grasa al instante. Seguro, ecológico y listo para usar.',
+        buyNow:'Cómpralo ahora', seeBenefits:'Ver beneficios', startGame:'Comenzar juego',
+        score:'Kills', restart:'Reiniciar',
+        p1t:'🔥 Limpieza Profunda', p1b:'Penetra y emulsifica grasas y aceites para un enjuague sin esfuerzo.',
+        p2t:'🍊 Poder Cítrico', p2b:'Fórmula segura y eficiente para uso doméstico o profesional.',
+        p3t:'🧽 Fácil de Usar', p3b:'Rocía, espera 5–15 min, cepilla y enjuaga. ¡Listo!',
+        benTitle:'Beneficios de CTX Grill Degreaser',
+        ben1:'<strong>Limpieza profunda y potente:</strong> Especialmente formulado para la limpieza intensiva y el mantenimiento diario de parrillas, sartenes y utensilios de cocina.',
+        ben2:'<strong>Fórmula ecológica:</strong> A base de agua y libre de COV, plomo y metales pesados.',
+        ben3:'<strong>Desengrasado rápido y eficaz:</strong> Penetra en las superficies para eliminar grasa, aceite y residuos de alimentos. El <em>indicador de color</em> incorporado se vuelve blanco al contacto con la grasa para una confirmación visual rápida.',
+        ben4:'<strong>Fresco aroma cítrico:</strong> El aroma a toronja mantiene tu cocina limpia y fresca después de cada uso.',
+        ben5:'<strong>Uso versátil:</strong> Perfecto para parrillas, herramientas de parrilla, sartenes y otras superficies grasosas. Seguro para ti, tus superficies y el medio ambiente.',
+        galeria:'Galería de contenido', galeriaTxt:'Videos destacados con tips de uso, demostraciones y antes/después. (Sustituye los archivos <code>assets/video*.mp4</code> por tus clips).',
+        social:'Conéctate con nosotros', socialTxt:'Tips de limpieza, recetas y promociones exclusivas.',
+        docs:'Documentos técnicos', docsTxt:'Descarga las fichas con especificaciones, seguridad y recomendaciones de uso.',
+        docEs:'Ficha Técnica español', docEn:'Data Sheet english', distrib:'Distribuidores',
+        buyTitle:'Compra CTX Grill Degreaser', buyTxt:'Disponible en canales oficiales y distribuidores autorizados.',
+        buyOnline:'Comprar en línea', contactSales:'Contactar ventas',
+        footerDemo:'Este sitio es una demo interactiva. Incluye modo accesible para usuarios con "reduced motion".'
+      },
+      en: {
+        title:'CTX Grill Degreaser – The best degreaser for your grill',
+        navPlay:'Play', navDocs:'Sheets', navBuy:'Buy', btnLang:'ES',
+        kicker:'The best degreaser for your grill',
+        heroTitle:'Spray. Aim. <span style="color:var(--primary)">Clean.</span>',
+        lead:'Professional cleaning for your grill at the reach of a spray!<br>The citrus power that eliminates grease instantly. Safe, eco-friendly and ready to use.',
+        buyNow:'Buy now', seeBenefits:'See benefits', startGame:'Start game',
+        score:'Kills', restart:'Restart',
+        p1t:'🔥 Deep Cleaning', p1b:'Penetrates and emulsifies grease and oils for effortless rinsing.',
+        p2t:'🍊 Citrus Power', p2b:'Safe and efficient formula for home or professional use.',
+        p3t:'🧽 Easy to Use', p3b:'Spray, wait 5–15 min, scrub and rinse. Done!',
+        benTitle:'Benefits of CTX Grill Degreaser',
+        ben1:'<strong>Deep and powerful cleaning:</strong> Specially formulated for intensive cleaning and daily maintenance of grills, pans and kitchen utensils.',
+        ben2:'<strong>Eco-friendly formula:</strong> Water-based and free of VOCs, lead and heavy metals.',
+        ben3:'<strong>Fast, effective degreasing:</strong> Penetrates surfaces to remove grease, oil and food residues. The built-in <em>color indicator</em> turns white on contact with grease for quick visual confirmation.',
+        ben4:'<strong>Fresh citrus scent:</strong> Grapefruit fragrance keeps your kitchen clean and fresh after every use.',
+        ben5:'<strong>Versatile use:</strong> Perfect for grills, grill tools, pans and other greasy surfaces. Safe for you, your surfaces and the environment.',
+        galeria:'Content gallery', galeriaTxt:'Featured videos with usage tips, demos and before/after. (Replace files <code>assets/video*.mp4</code> with your clips).',
+        social:'Connect with us', socialTxt:'Cleaning tips, recipes and exclusive promotions.',
+        docs:'Technical documents', docsTxt:'Download spec sheets, safety and usage recommendations.',
+        docEs:'Ficha Técnica español', docEn:'Data Sheet english', distrib:'Distributors',
+        buyTitle:'Buy CTX Grill Degreaser', buyTxt:'Available through official channels and authorized distributors.',
+        buyOnline:'Buy online', contactSales:'Contact sales',
+        footerDemo:'This site is an interactive demo. Includes accessible mode for users with reduced motion.'
+      }
+    };
+
+    function initialLang(){
+      const params = new URLSearchParams(location.search);
+      return (params.get('lang') && params.get('lang').startsWith('en')) ? 'en' : 'es';
+    }
+
+    function setBtnVisual(nextLang){
+      const btn = $('#langToggle');
+      if (!btn) return;
+      const isNextEN = nextLang==='en';
+      btn.innerHTML = `
+        <span class="flag" aria-hidden="true">${isNextEN ? US_FLAG : ES_FLAG}</span>
+        <span class="label">${isNextEN ? 'EN' : 'ES'}</span>
+      `;
+      btn.setAttribute('aria-label', isNextEN ? 'Switch to English (United States)' : 'Cambiar a español (España)');
+    }
+
+    function apply(lang){
+      html.setAttribute('lang', lang === 'en' ? 'en-US' : 'es-ES');
+      document.title = map[lang].title;
+
+      const np=$('#navPlay'), nd=$('#navDocs'), nb=$('#navBuy');
+      if(np) np.textContent = map[lang].navPlay;
+      if(nd) nd.textContent = map[lang].navDocs;
+      if(nb) nb.textContent = map[lang].navBuy;
+
+      setBtnVisual(lang==='es' ? 'en' : 'es');
+
+      const k=$('#kicker'), h=$('#t1'), l=$('#lead');
+      if(k) k.textContent = map[lang].kicker;
+      if(h){ h.replaceChildren(); h.innerHTML = map[lang].heroTitle; }
+      if(l){ l.replaceChildren(); l.innerHTML = map[lang].lead; }
+      const bbuy=$('#btnBuyNow'), bben=$('#btnBenefits'), bstart=$('#btnStart');
+      if(bbuy) bbuy.textContent = map[lang].buyNow;
+      if(bben) bben.textContent = map[lang].seeBenefits;
+      if(bstart) bstart.textContent = map[lang].startGame;
+
+      window.__scoreLabel = map[lang].score;
+      const restart=$('#restartBtn'); if(restart) restart.textContent = map[lang].restart;
+      const scoreEl=$('#score'); if(scoreEl) scoreEl.textContent = (window.__scoreLabel||'Kills') + ': ' + (window.__score||0);
+
+      const p1t=$('#p1t'), p1b=$('#p1b'), p2t=$('#p2t'), p2b=$('#p2b'), p3t=$('#p3t'), p3b=$('#p3b');
+      if(p1t) p1t.textContent = map[lang].p1t; if(p1b) p1b.textContent = map[lang].p1b;
+      if(p2t) p2t.textContent = map[lang].p2t; if(p2b) p2b.textContent = map[lang].p2b;
+      if(p3t) p3t.textContent = map[lang].p3t; if(p3b) p3b.textContent = map[lang].p3b;
+
+      const benTitle=$('#beneficiosTitle'); if(benTitle) benTitle.textContent = map[lang].benTitle;
+      const items = document.querySelectorAll('#beneficiosSheet .benefits li');
+      if(items.length>=5){ items[0].innerHTML=map[lang].ben1; items[1].innerHTML=map[lang].ben2; items[2].innerHTML=map[lang].ben3; items[3].innerHTML=map[lang].ben4; items[4].innerHTML=map[lang].ben5; }
+
+      const galH=$('#galeria'), galP=$('#galeriaTxt'); if(galH) galH.textContent = map[lang].galeria; if(galP) galP.innerHTML = map[lang].galeriaTxt;
+      const socH=$('#social'), socP=$('#socialTxt'); if(socH) socH.textContent = map[lang].social; if(socP) socP.textContent = map[lang].socialTxt;
+      const docsH=$('#docsH2'), docsP=$('#docsTxt'); if(docsH) docsH.textContent = map[lang].docs; if(docsP) docsP.textContent = map[lang].docsTxt;
+
+      const de=$('#docEs'), dn=$('#docEn'), dis=$('#distrib');
+      if(de) de.textContent = map[lang].docEs;
+      if(dn) dn.textContent = map[lang].docEn;
+      if(dis) dis.textContent = map[lang].distrib;
+
+      const buyH=$('#buy'), buyP=$('#buyTxt');
+      if(buyH) buyH.textContent = map[lang].buyTitle;
+      if(buyP) buyP.textContent = map[lang].buyTxt;
+      const buyOnline=$('#buyOnline'), contact=$('#contactSales');
+      if(buyOnline) buyOnline.textContent = map[lang].buyOnline;
+      if(contact) contact.textContent = map[lang].contactSales;
+
+      const sBuy=$('#stickyBuy'), sBen=$('#stickyBenefits');
+      if(sBuy) sBuy.textContent = map[lang].buyNow;
+      if(sBen) sBen.textContent = map[lang].seeBenefits;
+
+      const fDemo=$('#footerDemo'); if(fDemo) fDemo.textContent = map[lang].footerDemo;
+    }
+
+    let current = initialLang(); // default ES unless ?lang=en
+    apply(current);
+
+    const btn = $('#langToggle');
+    if (btn) {
+      btn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        current = (current === 'es') ? 'en' : 'es';
+        apply(current);
+        try { localStorage.setItem('ctx-lang', current); } catch(e){}
+        const url = new URL(location.href);
+        url.searchParams.set('lang', current);
+        history.replaceState(null, '', url.toString());
+      });
+    }
+  })();
+  </script>
+</body>
+</html>
