@@ -7,6 +7,7 @@
   <title>CTX Grill Degreaser – El mejor desengrasante para tu parrilla</title>
   <meta name="description" content="Un sitio vivo e interactivo para CTX Grill Degreaser. Apunta y elimina la grasa (bacterias) con tu cursor en forma de botella CTX." />
   <meta name="theme-color" content="#FF008C" />
+  <meta name="keywords" content="mejores desengrasantes para parrilla, bbq degreaser, bbq cleaner, mejor desengrasante, mejores desengrasantes, desengrasantes biodegradables, desengrasantes cítrico, citric degreaser, ecofriendly degreaser, CTX Grill Degreaser, Desengrasante para parrilla, desengrasante para cocina, Grill Degreaser, Kitchen degreaser" />
   <!-- Social -->
   <meta property="og:title" content="CTX Grill Degreaser – Spray. Aim. Clean." />
   <meta property="og:description" content="Explora el poder cítrico de CTX en una experiencia web jugable." />
@@ -242,8 +243,8 @@
             </blockquote>
           </div>
 
-          <a class="tile" id="callTile" href="tel:+17138244385"><strong>Llamar / SMS</strong></a>
-          <a class="tile" id="smsTile" href="sms:+17138244385"><strong>Enviar SMS</strong></a>
+          <a class="tile" id="callTile" href="tel:+18329486169"><strong>Llamar / SMS</strong></a>
+          <a class="tile" id="smsTile" href="sms:+18329486169"><strong>Enviar SMS</strong></a>
         </div>
       </div>
     </section>
@@ -255,17 +256,17 @@
       <div class="gallery" style="margin-top:14px">
         <a class="tile doc doc-es" href="https://blendergroup.com/storage/product/media/826/Ficha_Te__cnica.pdf" target="_blank" rel="noopener noreferrer" id="docEs">Ficha Técnica español</a>
         <a class="tile doc doc-en" href="https://blendergroup.com/storage/product/media/827/Data_Sheet.pdf" target="_blank" rel="noopener noreferrer" id="docEn">Data Sheet english</a>
-        <a class="tile" href="mailto:apadilla@blendergroup.com?subject=CTX%20Grill%20Degreaser%20-%20Bulk%20Inquiry" id="distrib">Distribuidores</a>
       </div>
     </section>
 
     <section class="container" id="comprar" aria-labelledby="buy">
       <h2 id="buy">Compra CTX Grill Degreaser</h2>
-      <p class="muted" id="buyTxt">Disponible en canales oficiales y distribuidores autorizados.</p>
+      <p class="muted" id="buyTxt">Disponible a solo un click!</p>
       <div class="cta-row" style="margin-top:12px">
         <a class="btn" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener" id="buyOnline">Comprar en línea</a>
-        <a class="btn ghost" href="#social" id="contactSales">Contactar ventas</a>
+        <a class="btn ghost" href="mailto:apadilla@blendergroup.com" id="contactSales">Contactar ventas</a>
       </div>
+      <p style="margin-top:12px;color:var(--muted);font-size:.95rem">Contacto: <a href="mailto:apadilla@blendergroup.com">apadilla@blendergroup.com</a> · Tel/SMS: <a href="tel:+18329486169">+1 (832) 948-6169</a></p>
     </section>
   </main>
 
@@ -279,11 +280,10 @@
   <footer>
     <div class="container">
       <p>© <span id="year"></span> CTX Grill Degreaser · Blender Group US.</p>
-      <p class="muted" id="footerDemo">Este sitio es una demo interactiva. Incluye modo accesible para usuarios con "reduced motion".</p>
     </div>
   </footer>
 
-  <div id="toast" class="toast" role="status" aria-live="polite">Número copiado: +1 (713) 824-4385</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Número copiado: +1 (832) 948-6169</div>
 
   <script>
 /* =================== GAME (mobile-friendly) =================== */
@@ -522,7 +522,8 @@
     spawnConfetti(); playWin();
     const msg=document.createElement('div'); msg.className='badge';
     Object.assign(msg.style,{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',fontSize:'1.05rem',background:'rgba(0,0,0,.7)',pointerEvents:'auto',textAlign:'center'});
-    msg.innerHTML='<strong>¡Misión cumplida!</strong><br/>Bacterias y grasa eliminadas de la parrilla.<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">Jugar de nuevo</a>';
+    const gs = window.__gameStrings || {};
+    msg.innerHTML = (gs.winHtml) ? gs.winHtml : '<strong>¡Misión cumplida!</strong><br/>Bacterias y grasa eliminadas de la parrilla.<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">Jugar de nuevo</a>';
     wrap.appendChild(msg);
     window.startAgain=(e)=>{ e.preventDefault(); msg.remove(); start(true); };
     raf = requestAnimationFrame(update);
@@ -537,8 +538,13 @@
   function endGame(){
     state='lost'; started=false; won=false; cancelAnimationFrame(raf); stopSpray();
     const msg=document.createElement('div'); msg.className='badge';
-    Object.assign(msg.style,{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',fontSize:'1.05rem',background:'rgba(0,0,0,.7)',pointerEvents:'auto'});
-    msg.innerHTML='Se acabó el tiempo. <strong>'+score+'</strong> bacterias eliminadas. <a href="#" style="margin-left:6px" onclick="startAgain(event)">Reintentar</a>';
+    Object.assign(msg.style,{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',fontSize:'1.05rem',background:'rgba(0,0,0,.7)',pointerEvents:'auto',textAlign:'center'});
+    const gs = window.__gameStrings || {};
+    if(gs.loseHtml){
+      msg.innerHTML = gs.loseHtml.replace('{{score}}', score);
+    } else {
+      msg.innerHTML = 'Se acabó el tiempo. <strong>'+score+'</strong> bacterias eliminadas. <a href="#" style="margin-left:6px" onclick="startAgain(event)">Reintentar</a>';
+    }
     wrap.appendChild(msg);
     window.startAgain=(e)=>{ e.preventDefault(); msg.remove(); start(); };
     raf = requestAnimationFrame(update);
@@ -587,7 +593,7 @@
   <!-- footer year -->
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
-  <!-- Beneficios tab, reveal, tel/SMS fallback, I18N (unchanged) -->
+  <!-- Beneficios tab, reveal, tel/SMS fallback, I18N -->
   <script>
 /* === Beneficios tab JS === */
 const beneficiosBtn = document.getElementById('beneficiosBtn');
@@ -619,7 +625,7 @@ if(location.hash === '#beneficios'){ try{ history.replaceState(null,'', location
 /* === Desktop-safe tel/SMS fallback === */
 (function telSmsFallback(){
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const phone = "+17138244385";
+  const phone = "+18329486169";
   const toast = document.getElementById('toast');
   function showToast(){
     toast.classList.add('show');
@@ -664,10 +670,15 @@ if(location.hash === '#beneficios'){ try{ history.replaceState(null,'', location
         galeria:'Galería de contenido', galeriaTxt:'Videos destacados con tips de uso, demostraciones y antes/después. (Sustituye los archivos <code>assets/video*.mp4</code> por tus clips).',
         social:'Conéctate con nosotros', socialTxt:'Tips de limpieza, recetas y promociones exclusivas.',
         docs:'Documentos técnicos', docsTxt:'Descarga las fichas con especificaciones, seguridad y recomendaciones de uso.',
-        docEs:'Ficha Técnica español', docEn:'Data Sheet english', distrib:'Distribuidores',
+        docEs:'Ficha Técnica español', docEn:'Data Sheet english',
         buyTitle:'Compra CTX Grill Degreaser', buyTxt:'Disponible en canales oficiales y distribuidores autorizados.',
         buyOnline:'Comprar en línea', contactSales:'Contactar ventas',
-        footerDemo:'Este sitio es una demo interactiva. Incluye modo accesible para usuarios con "reduced motion".'
+        gameWinTitle:'¡Misión cumplida!', gameWinBody:'Bacterias y grasa eliminadas de la parrilla.',
+        gamePlayAgain:'Jugar de nuevo',
+        gameTimeUp:'Se acabó el tiempo.',
+        gameKillsSuffix:'bacterias eliminadas.',
+        gameRetry:'Reintentar',
+        footerDemo:''
       },
       en: {
         title:'CTX Grill Degreaser – The best degreaser for your grill',
@@ -689,10 +700,16 @@ if(location.hash === '#beneficios'){ try{ history.replaceState(null,'', location
         galeria:'Content gallery', galeriaTxt:'Featured videos with usage tips, demos and before/after. (Replace files <code>assets/video*.mp4</code> with your clips).',
         social:'Connect with us', socialTxt:'Cleaning tips, recipes and exclusive promotions.',
         docs:'Technical documents', docsTxt:'Download spec sheets, safety and usage recommendations.',
-        docEs:'Ficha Técnica español', docEn:'Data Sheet english', distrib:'Distributors',
+        docEs:'Ficha Técnica español', docEn:'Data Sheet english',
         buyTitle:'Buy CTX Grill Degreaser', buyTxt:'Available through official channels and authorized distributors.',
         buyOnline:'Buy online', contactSales:'Contact sales',
-        footerDemo:'This site is an interactive demo. Includes accessible mode for users with reduced motion.'
+        gameWinTitle:'Mission accomplished!',
+        gameWinBody:'Bacteria and grease removed from the grill.',
+        gamePlayAgain:'Play again',
+        gameTimeUp:"Time's up.",
+        gameKillsSuffix:'bacteria eliminated.',
+        gameRetry:'Try again',
+        footerDemo:''
       }
     };
 
@@ -742,14 +759,22 @@ if(location.hash === '#beneficios'){ try{ history.replaceState(null,'', location
       $('#docsTxt') && (document.querySelector('#docsTxt').textContent = m.docsTxt);
       $('#docEs') && (document.querySelector('#docEs').textContent = m.docEs);
       $('#docEn') && (document.querySelector('#docEn').textContent = m.docEn);
-      $('#distrib') && (document.querySelector('#distrib').textContent = m.distrib);
       $('#buy') && (document.querySelector('#buy').textContent = m.buyTitle);
       $('#buyTxt') && (document.querySelector('#buyTxt').textContent = m.buyTxt);
       $('#buyOnline') && (document.querySelector('#buyOnline').textContent = m.buyOnline);
       $('#contactSales') && (document.querySelector('#contactSales').textContent = m.contactSales);
       $('#stickyBuy') && (document.querySelector('#stickyBuy').textContent = m.buyNow);
       $('#stickyBenefits') && (document.querySelector('#stickyBenefits').textContent = m.seeBenefits);
-      $('#footerDemo') && (document.querySelector('#footerDemo').textContent = m.footerDemo);
+      // setup game localized strings used by the canvas game
+      window.__gameStrings = {
+        winHtml: `<strong>${m.gameWinTitle}</strong><br/>${m.gameWinBody}<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">${m.gamePlayAgain}</a>`,
+        loseHtml: `${m.gameTimeUp} <strong>{{score}}</strong> ${m.gameKillsSuffix} <a href="#" style="margin-left:6px" onclick="startAgain(event)">${m.gameRetry}</a>`
+      };
+      // update contact info text if present
+      const contactLine = document.querySelector('#comprar p[style]');
+      if(contactLine){
+        contactLine.innerHTML = `Contacto: <a href="mailto:apadilla@blendergroup.com">apadilla@blendergroup.com</a> · Tel/SMS: <a href="tel:+18329486169">+1 (832) 948-6169</a>`;
+      }
     }
 
     // initial
