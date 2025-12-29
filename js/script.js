@@ -807,7 +807,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
     function setBtn(btn, nextLang) {
         if (!btn) return;
         const isEN = nextLang === 'en';
-        btn.innerHTML = `<span class="flag">${isEN ? MX_FLAG : MX_FLAG}</span><span>${isEN ? 'EN' : 'ES'}</span>`;
+        btn.innerHTML = `<span class="flag">${isEN ? US_FLAG : MX_FLAG}</span><span>${isEN ? 'EN' : 'ES'}</span>`;
         btn.setAttribute('aria-label', isEN ? 'Switch to English' : 'Cambiar a español');
     }
 
