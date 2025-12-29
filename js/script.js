@@ -1,9 +1,134 @@
 /* ==========================================
    CTX Grill Degreaser - Main JavaScript
+   Version 2.0 - Redesigned
    ========================================== */
 
 /* ==========================================
-   SECTION 1: Game Logic
+   SECTION 1: Loading Screen
+   ========================================== */
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+    }, 600);
+});
+
+/* ==========================================
+   SECTION 2: Header Scroll Effect
+   ========================================== */
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
+
+/* ==========================================
+   SECTION 3: Scroll Reveal Animations
+   ========================================== */
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const delay = entry.target.dataset.delay || 0;
+            setTimeout(() => entry.target.classList.add('visible'), parseInt(delay));
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.scroll-reveal, .what-card, .benefit-item, .use-chip, .gallery-tile').forEach(el => {
+    revealObserver.observe(el);
+});
+
+/* ==========================================
+   SECTION 4: Mobile Menu
+   ========================================== */
+(function() {
+    const menu = document.getElementById('mobileMenu');
+    const hamburger = document.getElementById('hamburger');
+    const closeMenuBtn = document.getElementById('closeMenu');
+
+    function openMenu() {
+        menu.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeMenu() {
+        menu.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('no-scroll');
+    }
+
+    hamburger?.addEventListener('click', () => {
+        menu.getAttribute('aria-hidden') !== 'false' ? openMenu() : closeMenu();
+    });
+
+    closeMenuBtn?.addEventListener('click', closeMenu);
+    menu.querySelector('[data-close-menu]')?.addEventListener('click', closeMenu);
+    menu.querySelectorAll('[data-menu-link]').forEach(l => {
+        l.addEventListener('click', () => setTimeout(closeMenu, 100));
+    });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeMenu();
+    });
+})();
+
+/* ==========================================
+   SECTION 5: Benefits Sheet
+   ========================================== */
+(function() {
+    const sheet = document.getElementById('beneficiosSheet');
+    const closeSheet = document.getElementById('closeBeneficios');
+
+    function openSheet() {
+        sheet.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeSheetFn() {
+        sheet.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('no-scroll');
+    }
+
+    document.querySelectorAll('[data-open-beneficios]').forEach(el => {
+        el.addEventListener('click', e => {
+            e.preventDefault();
+            openSheet();
+        });
+    });
+
+    closeSheet?.addEventListener('click', closeSheetFn);
+    sheet.querySelector('[data-close-beneficios]')?.addEventListener('click', closeSheetFn);
+})();
+
+/* ==========================================
+   SECTION 6: Year in Footer
+   ========================================== */
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ==========================================
+   SECTION 7: Toast for Desktop (Phone Copy)
+   ========================================== */
+(function() {
+    const toast = document.getElementById('toast');
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    function showToast() {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    if (!isMobile) {
+        document.getElementById('callBtn')?.addEventListener('click', e => {
+            e.preventDefault();
+            navigator.clipboard?.writeText('+18329486169').then(showToast);
+        });
+        document.getElementById('smsBtn')?.addEventListener('click', e => {
+            e.preventDefault();
+            navigator.clipboard?.writeText('+18329486169').then(showToast);
+        });
+    }
+})();
+
+/* ==========================================
+   SECTION 8: Game Logic
    ========================================== */
 (function() {
     const canvas = document.getElementById('arena');
@@ -12,98 +137,68 @@
     const timerEl = document.getElementById('timer');
     const restartBtn = document.getElementById('restartBtn');
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    let actx = null, gain = null, noiseSrc = null;
-    let soundOn = true;
 
     let ctx, W, H, DPR = 1;
     let bacteria = [], particles = [], confetti = [];
-    let spraying = false, score = 0, time = 10, raf, started = false, won = false, shine = 0, t = 0;
-    let state = 'idle';
+    let spraying = false, score = 0, time = 15, raf, started = false, won = false, shine = 0, t = 0;
+    let state = 'idle', gameReady = false;
 
     const dirtCanvas = document.createElement('canvas');
     const dirtCtx = dirtCanvas.getContext('2d');
-
-    let _rzTimer = null;
-
-    function resize() {
-        clearTimeout(_rzTimer);
-        _rzTimer = setTimeout(_doResize, 60);
-    }
-
-    function _doResize() {
-        const rect = wrap.getBoundingClientRect();
-        DPR = Math.min((window.devicePixelRatio || 1), isMobile ? 1.5 : 2);
-        W = Math.max(280, Math.floor(rect.width));
-        H = Math.max(240, Math.floor(rect.height));
-
-        canvas.width = W * DPR;
-        canvas.height = H * DPR;
-        canvas.style.width = W + 'px';
-        canvas.style.height = H + 'px';
-
-        ctx = canvas.getContext('2d');
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-
-        dirtCanvas.width = W;
-        dirtCanvas.height = H;
-        drawDirt();
-    }
+    let actx = null, gain = null, noiseSrc = null;
 
     function rand(a, b) {
         return Math.random() * (b - a) + a;
     }
 
-    function drawGrillBackground() {
+    function resize() {
+        if (!wrap) return;
+        const rect = wrap.getBoundingClientRect();
+        DPR = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+        W = Math.max(280, Math.floor(rect.width));
+        H = Math.max(180, Math.floor(rect.height));
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx = canvas.getContext('2d');
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        dirtCanvas.width = W;
+        dirtCanvas.height = H;
+        drawDirt();
+    }
+
+    function drawGrillBg() {
         const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#1b1c20');
-        grad.addColorStop(.5, '#0f1013');
-        grad.addColorStop(1, '#1b1c20');
+        grad.addColorStop(0, '#1a1a1f');
+        grad.addColorStop(0.5, '#0f0f12');
+        grad.addColorStop(1, '#1a1a1f');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
-
-        for (let x = 20; x < W; x += 80) {
-            const g = ctx.createLinearGradient(x - 4, 0, x + 12, 0);
-            g.addColorStop(0, '#17181b');
-            g.addColorStop(.5, '#c8ccd3');
-            g.addColorStop(1, '#1a1b1f');
+        for (let x = 25; x < W; x += 55) {
+            const g = ctx.createLinearGradient(x - 5, 0, x + 12, 0);
+            g.addColorStop(0, '#18181c');
+            g.addColorStop(0.5, '#8a8d95');
+            g.addColorStop(1, '#1a1a1f');
             ctx.fillStyle = g;
-            ctx.fillRect(x - 4, 0, 16, H);
-            ctx.fillStyle = 'rgba(255,255,255,.15)';
-            for (let y = 20; y < H; y += 80) {
-                ctx.fillRect(x + 2, y, 2, 2);
-            }
+            ctx.fillRect(x - 5, 0, 12, H);
         }
-
-        ctx.globalAlpha = .08;
-        ctx.fillStyle = '#fff';
-        for (let y = 0; y < H; y += 36) {
-            ctx.fillRect(0, y, W, 1);
-        }
-        ctx.globalAlpha = 1;
     }
 
     function drawDirt() {
         dirtCtx.clearRect(0, 0, W, H);
-        dirtCtx.fillStyle = 'rgba(80,50,20,0.58)';
+        dirtCtx.fillStyle = 'rgba(60,40,15,0.55)';
         dirtCtx.fillRect(0, 0, W, H);
-        const dots = isMobile ? 420 : 700;
+        const dots = isMobile ? 250 : 400;
         for (let i = 0; i < dots; i++) {
-            dirtCtx.fillStyle = `rgba(120,80,40,${rand(.05, .22)})`;
+            dirtCtx.fillStyle = `rgba(100,70,30,${rand(0.05, 0.22)})`;
             dirtCtx.beginPath();
-            dirtCtx.arc(rand(0, W), rand(0, H), rand(1, 3.2), 0, Math.PI * 2);
+            dirtCtx.arc(rand(0, W), rand(0, H), rand(1, 3.5), 0, Math.PI * 2);
             dirtCtx.fill();
         }
-        dirtCtx.globalAlpha = .22;
-        dirtCtx.fillStyle = '#000';
-        for (let x = 0; x < W; x += 90) {
-            dirtCtx.fillRect(x, 0, 3, H);
-        }
-        dirtCtx.globalAlpha = 1;
     }
 
-    function cleanAt(x, y, r = 56) {
+    function cleanAt(x, y, r = 45) {
         dirtCtx.globalCompositeOperation = 'destination-out';
         const g = dirtCtx.createRadialGradient(x, y, 0, x, y, r);
         g.addColorStop(0, 'rgba(0,0,0,1)');
@@ -116,90 +211,80 @@
     }
 
     function spawnBacteria(n) {
-        bacteria.length = 0;
-        const count = n ?? (isMobile ? 7 : 10);
+        bacteria = [];
+        const count = n ?? (isMobile ? 5 : 7);
         for (let i = 0; i < count; i++) {
-            const r = rand(16, 28);
+            const r = rand(16, 26);
             bacteria.push({
-                x: rand(r, W - r),
-                y: rand(r, H - r),
+                x: rand(r + 15, W - r - 15),
+                y: rand(r + 15, H - r - 15),
                 r,
-                vx: rand(-1.2, 1.2),
-                vy: rand(-1.2, 1.2),
+                vx: rand(-0.8, 0.8),
+                vy: rand(-0.8, 0.8),
                 life: 1,
                 dead: false,
-                hue: rand(110, 140),
+                hue: rand(100, 140),
                 face: Math.floor(rand(0, 3)),
-                wob: rand(0.06, 0.12),
+                wob: rand(0.04, 0.08),
                 phase: rand(0, Math.PI * 2),
-                lobes: Math.floor(rand(5, 8)),
+                lobes: Math.floor(rand(5, 7)),
                 blink: rand(0, 1)
             });
         }
     }
 
-    /* ===== Pointer Events (mouse + touch) ===== */
-    let mouse = { x: 0, y: 0 }, activePointerId = null;
+    let mouse = { x: 0, y: 0 }, activePtr = null;
 
-    function updatePointerXY(e) {
+    function updateXY(e) {
         const r = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - r.left;
-        mouse.y = e.clientY - r.top;
+        mouse.x = (e.clientX || e.touches?.[0]?.clientX || 0) - r.left;
+        mouse.y = (e.clientY || e.touches?.[0]?.clientY || 0) - r.top;
     }
 
-    canvas.addEventListener('pointermove', (e) => {
-        if (activePointerId === null || e.pointerId === activePointerId) updatePointerXY(e);
-    }, { passive: true });
-
-    canvas.addEventListener('pointerdown', async (e) => {
-        activePointerId = e.pointerId;
-        canvas.setPointerCapture(activePointerId);
-        updatePointerXY(e);
+    canvas.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        activePtr = e.pointerId;
+        try { canvas.setPointerCapture(activePtr); } catch (err) { }
+        updateXY(e);
         spraying = true;
-        await resumeAudioIfNeeded();
         startSpray();
         if (navigator.vibrate) navigator.vibrate(10);
-        if ((state === 'idle' || state === 'won' || state === 'lost')) start();
-    }, { passive: true });
+        if (state === 'idle' || state === 'won' || state === 'lost') startGame();
+    });
 
-    window.addEventListener('pointerup', (e) => {
-        if (e.pointerId === activePointerId) {
+    canvas.addEventListener('pointermove', e => {
+        if (activePtr === null || e.pointerId === activePtr) updateXY(e);
+    });
+
+    window.addEventListener('pointerup', e => {
+        if (e.pointerId === activePtr) {
             spraying = false;
             stopSpray();
-            activePointerId = null;
+            activePtr = null;
         }
-    }, { passive: true });
+    });
 
     window.addEventListener('pointercancel', () => {
         spraying = false;
         stopSpray();
-        activePointerId = null;
-    }, { passive: true });
-
-    restartBtn.addEventListener('click', async () => {
-        await resumeAudioIfNeeded();
-        start(true);
+        activePtr = null;
     });
 
-    document.getElementById('btnStart')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        document.getElementById('arena-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await resumeAudioIfNeeded();
-        start();
-    });
+    restartBtn?.addEventListener('click', () => startGame(true));
 
     function spray() {
         const perFrame = isMobile ? 4 : 8;
         for (let i = 0; i < perFrame; i++) {
+            const angle = rand(-0.4, 0.4), speed = rand(2.5, 4.5);
             particles.push({
                 x: mouse.x,
                 y: mouse.y,
-                vx: rand(2.2, 4.2) * Math.cos(rand(-.6, .6)),
-                vy: rand(2.2, 4.2) * Math.sin(rand(-.6, .6)),
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
                 life: 1
             });
         }
-        const maxP = isMobile ? 280 : 480;
+        const maxP = isMobile ? 150 : 300;
         if (particles.length > maxP) particles.splice(0, particles.length - maxP);
     }
 
@@ -207,77 +292,46 @@
         ctx.save();
         ctx.translate(b.x, b.y);
         const k = b.lobes, r = b.r, amp = r * b.wob;
-        ctx.fillStyle = `hsl(${b.hue},80%,${b.dead ? 42 : 55}%)`;
+        ctx.fillStyle = `hsl(${b.hue},70%,${b.dead ? 35 : 48}%)`;
         ctx.beginPath();
-        for (let a = 0; a <= Math.PI * 2 + 0.001; a += Math.PI / 60) {
-            const rad = r + Math.sin(a * k + b.phase + t * 1.6) * amp;
+        for (let a = 0; a <= Math.PI * 2 + 0.01; a += Math.PI / 45) {
+            const rad = r + Math.sin(a * k + b.phase + t * 1.4) * amp;
             const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
-            if (a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            if (a === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
         }
         ctx.closePath();
         ctx.fill();
-
-        ctx.strokeStyle = `hsla(${b.hue},80%,30%,.6)`;
-        ctx.lineWidth = 1.2;
-        for (let i = 0; i < 4; i++) {
-            const a = (i / 4) * Math.PI * 2 + b.phase;
-            const rad = r + Math.sin(a * k + t * 1.4) * amp + 2;
-            const sx = Math.cos(a) * rad, sy = Math.sin(a) * rad;
-            ctx.beginPath();
-            ctx.moveTo(sx, sy);
-            ctx.quadraticCurveTo(sx + Math.cos(a) * 8, sy + Math.sin(a) * 8, sx + Math.cos(a) * 14, sy + Math.sin(a) * 14);
-            ctx.stroke();
-        }
-
-        const blinkOpen = (Math.sin(t * 2 + b.blink * 6) > -0.4);
-        const eyeR = r * 0.16;
+        const blinkOpen = Math.sin(t * 2 + b.blink * 6) > -0.3;
+        const eyeR = r * 0.14;
         ctx.fillStyle = 'rgba(0,0,0,.65)';
         ctx.beginPath();
-        ctx.ellipse(-r * 0.35, -r * 0.15, eyeR, blinkOpen ? eyeR : eyeR * 0.2, 0, 0, Math.PI * 2);
+        ctx.ellipse(-r * 0.28, -r * 0.1, eyeR, blinkOpen ? eyeR : eyeR * 0.2, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.ellipse(r * 0.35, -r * 0.15, eyeR, blinkOpen ? eyeR : eyeR * 0.2, 0, 0, Math.PI * 2);
+        ctx.ellipse(r * 0.28, -r * 0.1, eyeR, blinkOpen ? eyeR : eyeR * 0.2, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.lineWidth = Math.max(2, r * 0.12);
-        ctx.strokeStyle = '#0b0b0f';
+        ctx.lineWidth = Math.max(1.5, r * 0.08);
+        ctx.strokeStyle = '#0a0a0c';
         ctx.beginPath();
-        if (b.face === 0) {
-            ctx.arc(0, r * 0.2, r * 0.45, 0.1, Math.PI - 0.1, false);
-        } else if (b.face === 1) {
-            ctx.moveTo(-r * 0.4, r * 0.28);
-            ctx.quadraticCurveTo(0, r * (0.05 + 0.05 * Math.sin(t * 2)), r * 0.4, r * 0.28);
-        } else {
-            const mR = r * (0.22 + 0.03 * Math.sin(t * 2));
-            ctx.arc(0, r * 0.1, mR, 0, Math.PI * 2);
-        }
+        if (b.face === 0) ctx.arc(0, r * 0.18, r * 0.35, 0.1, Math.PI - 0.1, false);
+        else if (b.face === 1) {
+            ctx.moveTo(-r * 0.3, r * 0.22);
+            ctx.quadraticCurveTo(0, r * 0.08, r * 0.3, r * 0.22);
+        } else ctx.arc(0, r * 0.1, r * 0.18, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
-    }
-
-    function drawShine() {
-        if (!won) return;
-        shine += 6;
-        const x = (shine % (W + 300)) - 300;
-        const grad = ctx.createLinearGradient(x, 0, x + 200, H);
-        grad.addColorStop(0, 'rgba(255,255,255,0)');
-        grad.addColorStop(.5, 'rgba(255,255,255,.18)');
-        grad.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = grad;
-        ctx.globalCompositeOperation = 'screen';
-        ctx.fillRect(x - 50, 0, 260, H);
-        ctx.globalCompositeOperation = 'source-over';
     }
 
     function update() {
         t += 1 / 60;
         ctx.clearRect(0, 0, W, H);
-        drawGrillBackground();
+        drawGrillBg();
         ctx.drawImage(dirtCanvas, 0, 0);
 
         for (const b of bacteria) {
             if (b.dead) {
-                b.life -= .05;
+                b.life -= 0.05;
                 continue;
             }
             b.x += b.vx;
@@ -286,12 +340,12 @@
             if (b.y < b.r || b.y > H - b.r) b.vy *= -1;
         }
 
-        if (spraying && !prefersReduced) spray();
+        if (spraying) spray();
 
         for (const p of particles) {
             p.x += p.vx;
             p.y += p.vy;
-            p.life -= .04;
+            p.life -= 0.03;
         }
         particles = particles.filter(p => p.life > 0);
 
@@ -299,7 +353,7 @@
             if (b.dead) continue;
             for (const p of particles) {
                 const dx = b.x - p.x, dy = b.y - p.y;
-                if (dx * dx + dy * dy < (b.r * b.r * .8)) {
+                if (dx * dx + dy * dy < b.r * b.r * 0.65) {
                     b.dead = true;
                     score++;
                     window.__score = score;
@@ -312,28 +366,27 @@
         }
 
         for (const p of particles) {
-            ctx.globalAlpha = Math.max(p.life, .1);
-            ctx.fillStyle = 'rgba(255,255,255,.9)';
+            ctx.globalAlpha = Math.max(p.life, 0.1);
+            ctx.fillStyle = 'rgba(255,255,255,.85)';
             ctx.beginPath();
             ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
             ctx.fill();
         }
-
         ctx.globalAlpha = 1;
 
         for (const b of bacteria) {
-            const a = b.dead ? Math.max(b.life, 0) : 1;
-            if (a <= 0) continue;
-            ctx.globalAlpha = a;
+            const alpha = b.dead ? Math.max(b.life, 0) : 1;
+            if (alpha <= 0) continue;
+            ctx.globalAlpha = alpha;
             drawBacteria(b);
             ctx.globalAlpha = 1;
         }
 
         for (const c of confetti) {
-            c.vy += 0.08;
+            c.vy += 0.1;
             c.x += c.vx;
             c.y += c.vy;
-            c.life -= .01;
+            c.life -= 0.01;
             ctx.globalAlpha = Math.max(c.life, 0);
             ctx.fillStyle = c.color;
             ctx.fillRect(c.x, c.y, c.w, c.h);
@@ -341,7 +394,18 @@
         confetti = confetti.filter(c => c.life > 0);
         ctx.globalAlpha = 1;
 
-        drawShine();
+        if (won) {
+            shine += 5;
+            const x = (shine % (W + 250)) - 250;
+            const grad = ctx.createLinearGradient(x, 0, x + 180, H);
+            grad.addColorStop(0, 'rgba(255,255,255,0)');
+            grad.addColorStop(0.5, 'rgba(255,255,255,.18)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = grad;
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillRect(x - 40, 0, 220, H);
+            ctx.globalCompositeOperation = 'source-over';
+        }
 
         if (started && !won) {
             time -= 1 / 60;
@@ -361,22 +425,6 @@
         raf = requestAnimationFrame(update);
     }
 
-    function spawnConfetti() {
-        const count = isMobile ? 90 : 140;
-        for (let i = 0; i < count; i++) {
-            confetti.push({
-                x: rand(0, W),
-                y: rand(-40, 20),
-                vx: rand(-1, 1),
-                vy: rand(0.5, 2),
-                w: rand(3, 6),
-                h: rand(6, 12),
-                color: `hsl(${rand(300, 340)},90%,60%)`,
-                life: 1
-            });
-        }
-    }
-
     function celebrate() {
         state = 'won';
         started = false;
@@ -387,48 +435,45 @@
         particles = [];
         spraying = false;
         stopSpray();
-        spawnConfetti();
+        const count = isMobile ? 70 : 100;
+        for (let i = 0; i < count; i++) {
+            confetti.push({
+                x: rand(0, W),
+                y: rand(-30, 15),
+                vx: rand(-1.2, 1.2),
+                vy: rand(1, 2.5),
+                w: rand(4, 7),
+                h: rand(7, 12),
+                color: `hsl(${rand(300, 360)},85%,60%)`,
+                life: 1
+            });
+        }
         playWin();
-
-        const msg = document.createElement('div');
-        msg.className = 'badge';
-        Object.assign(msg.style, {
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%,-50%)',
-            fontSize: '1.05rem',
-            background: 'rgba(0,0,0,.7)',
-            pointerEvents: 'auto',
-            textAlign: 'center'
-        });
-        const gs = window.__gameStrings || {};
-        msg.innerHTML = gs.winHtml || '<strong>¡Misión cumplida!</strong><br/>Bacterias y grasa eliminadas de la parrilla.<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">Jugar de nuevo</a>';
-        wrap.appendChild(msg);
-
-        window.startAgain = (e) => {
-            e.preventDefault();
-            msg.remove();
-            start(true);
-        };
+        showMsg(window.__gameStrings?.winHtml || '<strong>¡Misión cumplida!</strong><br>Bacterias eliminadas.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Jugar de nuevo</a>');
         raf = requestAnimationFrame(update);
     }
 
-    function start() {
+    function startGame(force) {
+        wrap.querySelectorAll('.game-msg').forEach(el => el.remove());
         won = false;
         started = true;
         state = 'playing';
         score = 0;
-        time = 10;
+        time = 15;
         window.__score = 0;
         scoreEl.textContent = (window.__scoreLabel || 'Kills') + ': 0';
-        timerEl.textContent = '00:10';
+        timerEl.textContent = '00:15';
         particles = [];
         confetti = [];
         spawnBacteria();
         drawDirt();
         spraying = false;
         stopSpray();
+        if (!gameReady || force) {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(update);
+            gameReady = true;
+        }
     }
 
     function endGame() {
@@ -437,87 +482,48 @@
         won = false;
         cancelAnimationFrame(raf);
         stopSpray();
+        const gs = window.__gameStrings || {};
+        showMsg(gs.loseHtml?.replace('{{score}}', score) || `¡Tiempo! <strong>${score}</strong> bacterias.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Reintentar</a>`);
+        raf = requestAnimationFrame(update);
+    }
+
+    function showMsg(html) {
         const msg = document.createElement('div');
-        msg.className = 'badge';
+        msg.className = 'badge game-msg';
         Object.assign(msg.style, {
             position: 'absolute',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%,-50%)',
-            fontSize: '1.05rem',
-            background: 'rgba(0,0,0,.7)',
+            fontSize: '.95rem',
+            background: 'rgba(0,0,0,.85)',
             pointerEvents: 'auto',
-            textAlign: 'center'
+            textAlign: 'center',
+            padding: '14px 22px',
+            borderRadius: '14px'
         });
-        const gs = window.__gameStrings || {};
-        msg.innerHTML = (gs.loseHtml ? gs.loseHtml.replace('{{score}}', score)
-            : `Se acabó el tiempo. <strong>${score}</strong> bacterias eliminadas. <a href="#" style="margin-left:6px" onclick="startAgain(event)">Reintentar</a>`);
+        msg.innerHTML = html;
         wrap.appendChild(msg);
-        window.startAgain = (e) => {
+        window.startAgain = e => {
             e.preventDefault();
             msg.remove();
-            start();
+            startGame();
         };
-        raf = requestAnimationFrame(update);
     }
 
-    function init() {
-        _doResize();
-        spawnBacteria(8);
-        update();
-    }
-
-    window.addEventListener('resize', resize);
-
-    /* === CTX BOTTLE CURSOR (auto-remove white bg) === */
-    (function makeCursor() {
-        const src = "https://i.imgur.com/ow3h5Kt.png";
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-            const s = 64;
-            const cnv = document.createElement('canvas');
-            cnv.width = s;
-            cnv.height = s;
-            const c = cnv.getContext('2d');
-            const scale = Math.min(s / img.width, s / img.height);
-            const w = img.width * scale, h = img.height * scale;
-            c.drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
-            const imgd = c.getImageData(0, 0, s, s);
-            const d = imgd.data;
-            for (let i = 0; i < d.length; i += 4) {
-                const r = d[i], g = d[i + 1], b = d[i + 2];
-                if (r > 245 && g > 245 && b > 245) d[i + 3] = 0;
-            }
-            c.putImageData(imgd, 0, 0);
-            const url = cnv.toDataURL("image/png");
-            document.body.style.cursor = `url('${url}') 10 10, auto`;
-        };
-        img.src = src;
-    })();
-
-    /* === Audio (mobile-safe) === */
+    /* Audio Functions */
     function ensureAudio() {
         if (actx) return;
         actx = new (window.AudioContext || window.webkitAudioContext)();
         gain = actx.createGain();
-        gain.gain.value = 0.22;
+        gain.gain.value = 0.18;
         gain.connect(actx.destination);
     }
 
-    async function resumeAudioIfNeeded() {
-        if (!soundOn) return;
-        try {
-            ensureAudio();
-            if (actx && actx.state === 'suspended') await actx.resume();
-        } catch (e) { }
-    }
-
     function startSpray() {
-        if (!soundOn) return;
         try {
             ensureAudio();
-            if (actx && actx.state === 'suspended') actx.resume();
+            if (actx?.state === 'suspended') actx.resume();
             stopSpray();
 
             const buffer = actx.createBuffer(1, actx.sampleRate, actx.sampleRate);
@@ -528,7 +534,7 @@
             noiseSrc.buffer = buffer;
             const filt = actx.createBiquadFilter();
             filt.type = 'highpass';
-            filt.frequency.value = 1000;
+            filt.frequency.value = 1100;
             noiseSrc.connect(filt);
             filt.connect(gain);
             noiseSrc.loop = true;
@@ -544,371 +550,325 @@
     }
 
     function playPop() {
-        if (!soundOn || !actx) return;
+        if (!actx) return;
         const o = actx.createOscillator();
         const g = actx.createGain();
         o.type = 'sine';
-        o.frequency.setValueAtTime(600, actx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(120, actx.currentTime + 0.12);
-        g.gain.setValueAtTime(0.35, actx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.12);
+        o.frequency.setValueAtTime(450, actx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(90, actx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.25, actx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.1);
         o.connect(g);
         g.connect(gain);
         o.start();
-        o.stop(actx.currentTime + 0.13);
+        o.stop(actx.currentTime + 0.11);
     }
 
     function playWin() {
-        if (!soundOn || !actx) return;
+        if (!actx) return;
         const o = actx.createOscillator();
         const g = actx.createGain();
         o.type = 'triangle';
-        o.frequency.setValueAtTime(440, actx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(880, actx.currentTime + 0.25);
-        g.gain.setValueAtTime(0.5, actx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.4);
+        o.frequency.setValueAtTime(400, actx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(800, actx.currentTime + 0.25);
+        g.gain.setValueAtTime(0.35, actx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.35);
         o.connect(g);
         g.connect(gain);
         o.start();
-        o.stop(actx.currentTime + 0.45);
+        o.stop(actx.currentTime + 0.4);
+    }
+
+    /* Custom Cursor */
+    (function makeCursor() {
+        const src = "https://i.imgur.com/ow3h5Kt.png";
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const s = 44, cnv = document.createElement('canvas');
+            cnv.width = s;
+            cnv.height = s;
+            const c = cnv.getContext('2d'), scale = Math.min(s / img.width, s / img.height);
+            const w = img.width * scale, h = img.height * scale;
+            c.drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
+            const imgd = c.getImageData(0, 0, s, s), d = imgd.data;
+            for (let i = 0; i < d.length; i += 4) {
+                if (d[i] > 245 && d[i + 1] > 245 && d[i + 2] > 245) d[i + 3] = 0;
+            }
+            c.putImageData(imgd, 0, 0);
+            document.body.style.cursor = `url('${cnv.toDataURL("image/png")}') 8 8, auto`;
+        };
+        img.src = src;
+    })();
+
+    /* Initialize Game */
+    function init() {
+        resize();
+        spawnBacteria(6);
+        ctx.clearRect(0, 0, W, H);
+        drawGrillBg();
+        ctx.drawImage(dirtCanvas, 0, 0);
+        for (const b of bacteria) drawBacteria(b);
+        showMsg(window.__gameStrings?.startHtml || '👆 <span id="startMsgText">Toca para comenzar</span>');
+        canvas.addEventListener('pointerdown', function rmStart() {
+            wrap.querySelectorAll('.game-msg').forEach(el => el.remove());
+            canvas.removeEventListener('pointerdown', rmStart);
+        }, { once: true });
     }
 
     document.addEventListener('visibilitychange', () => {
-        // If the tab goes background, stop spray sound to avoid stuck noise.
         if (document.hidden) {
             spraying = false;
             stopSpray();
         }
-    }, { passive: true });
+    });
 
-    init();
+    let rzTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(rzTimer);
+        rzTimer = setTimeout(resize, 100);
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
 
 /* ==========================================
-   SECTION 2: Year in Footer
-   ========================================== */
-document.getElementById('year').textContent = new Date().getFullYear();
-
-/* ==========================================
-   SECTION 3: Benefits Sheet Logic
+   SECTION 9: Internationalization (i18n)
    ========================================== */
 (function() {
-    const beneficiosBtn = document.getElementById('beneficiosBtn');
-    const beneficiosSheet = document.getElementById('beneficiosSheet');
-    const closeBeneficios = document.getElementById('closeBeneficios');
-    const beneficiosOpeners = document.querySelectorAll('[data-open-beneficios]');
-    const beneficiosBackdrop = document.querySelector('.sheet__backdrop');
+    const $ = sel => document.querySelector(sel);
 
-    function openBeneficios() {
-        beneficiosSheet.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('no-scroll');
-        closeBeneficios?.focus();
-    }
+    const US_FLAG = `<svg viewBox="0 0 7410 3900"><path fill="#b22234" d="M0 0h7410v3900H0z"/><path stroke="#fff" stroke-width="300" d="M0 450h7410M0 1050h7410M0 1650h7410M0 2250h7410M0 2850h7410M0 3450h7410"/><path fill="#3c3b6e" d="M0 0h2964v2100H0z"/></svg>`;
+    const MX_FLAG = `<svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#006847"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce1126"/></svg>`;
 
-    function closeBeneficiosSheet() {
-        beneficiosSheet.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('no-scroll');
-    }
-
-    beneficiosBtn?.addEventListener('click', (e) => {
-        e.preventDefault();
-        openBeneficios();
-    });
-    closeBeneficios?.addEventListener('click', () => closeBeneficiosSheet());
-    beneficiosBackdrop?.addEventListener('click', () => closeBeneficiosSheet());
-    beneficiosOpeners.forEach(el => el.addEventListener('click', (e) => {
-        e.preventDefault();
-        openBeneficios();
-    }));
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && beneficiosSheet.getAttribute('aria-hidden') === 'false') closeBeneficiosSheet();
-    });
-})();
-
-/* ==========================================
-   SECTION 4: Scroll Reveal Animation
-   ========================================== */
-(function() {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-        document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
-        return;
-    }
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('in');
-                io.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-})();
-
-/* ==========================================
-   SECTION 5: Desktop-safe tel/SMS fallback
-   ========================================== */
-(function() {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const phone = "+18329486169";
-    const toast = document.getElementById('toast');
-
-    function showToast() {
-        toast.classList.add('show');
-        clearTimeout(window.__toastTimer);
-        window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
-    }
-
-    function copyPhone() {
-        navigator.clipboard?.writeText(phone).then(showToast).catch(showToast);
-    }
-
-    document.getElementById('callBtn')?.addEventListener('click', (e) => {
-        if (!isMobile) {
-            e.preventDefault();
-            copyPhone();
-        }
-    });
-    document.getElementById('smsBtn')?.addEventListener('click', (e) => {
-        if (!isMobile) {
-            e.preventDefault();
-            copyPhone();
-        }
-    });
-})();
-
-/* ==========================================
-   SECTION 6: Hamburger Menu Logic
-   ========================================== */
-(function() {
-    const menu = document.getElementById('mobileMenu');
-    const openBtn = document.getElementById('hamburger');
-    const closeBtn = document.getElementById('closeMenu');
-    const backdrop = menu.querySelector('[data-close-menu]');
-    const links = menu.querySelectorAll('[data-menu-link]');
-
-    function openMenu() {
-        menu.setAttribute('aria-hidden', 'false');
-        openBtn.setAttribute('aria-expanded', 'true');
-        document.body.classList.add('no-scroll');
-        closeBtn?.focus();
-    }
-
-    function closeMenu() {
-        menu.setAttribute('aria-hidden', 'true');
-        openBtn.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('no-scroll');
-    }
-
-    openBtn?.addEventListener('click', () => {
-        const hidden = menu.getAttribute('aria-hidden') !== 'false';
-        hidden ? openMenu() : closeMenu();
-    });
-    closeBtn?.addEventListener('click', closeMenu);
-    backdrop?.addEventListener('click', closeMenu);
-    links.forEach(l => l.addEventListener('click', () => setTimeout(closeMenu, 120)));
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menu.getAttribute('aria-hidden') === 'false') closeMenu();
-    });
-})();
-
-/* ==========================================
-   SECTION 7: Internationalization (i18n)
-   ========================================== */
-(function() {
-    const $ = (sel) => document.querySelector(sel);
-
-    const US_FLAG = `<svg viewBox="0 0 7410 3900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-<path fill="#b22234" d="M0 0h7410v3900H0z"/>
-<path stroke="#fff" stroke-width="300" d="M0 450h7410M0 1050h7410M0 1650h7410M0 2250h7410M0 2850h7410M0 3450h7410"/>
-<path fill="#3c3b6e" d="M0 0h2964v2100H0z"/>
-</svg>`;
-
-    const ES_FLAG = `<svg viewBox="0 0 3 2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-<rect width="3" height="2" fill="#AA151B"/>
-<rect y="0.5" width="3" height="1" fill="#F1BF00"/>
-</svg>`;
-
-    const map = {
+    const i18n = {
         es: {
-            title: 'CTX Grill Degreaser – El mejor desengrasante para tu parrilla',
-            navPlay: 'Jugar',
-            navDocs: 'Fichas',
+            loaderText: 'CARGANDO...',
+            navWhat: '¿Qué es?',
+            navBenefits: 'Beneficios',
+            navPlay: 'Juego',
             navBuy: 'Comprar',
-            kicker: 'El mejor desengrasante para tu parrilla',
-            heroTitle: 'Apunta. Spray. <span style="color:var(--primary)">Limpia.</span>',
-            lead: '¡Limpieza Profesional para Tu Parrilla, al Alcance de un Spray!<br>El poder cítrico que elimina grasa al instante. Seguro, ecológico y listo para usar.',
-            buyNow: 'Cómpralo ahora',
-            seeBenefits: 'Ver beneficios',
-            startGame: 'Comenzar juego',
-            score: 'Kills',
-            restart: 'Reiniciar',
-            p1t: '🔥 Limpieza Profunda',
-            p1b: 'Penetra y emulsifica grasas y aceites para un enjuague sin esfuerzo.',
-            p2t: '🍊 Poder Cítrico',
-            p2b: 'Fórmula segura y eficiente para uso doméstico o profesional.',
-            p3t: '🧽 Fácil de Usar',
-            p3b: 'Rocía, espera 5–15 min, cepilla y enjuaga. ¡Listo!',
-            usesTitle: 'Usos que tiene CTX',
-            galeria: 'Galería de contenido',
-            galeriaTxt: 'Videos destacados con tips de uso, demostraciones y antes/después.',
-            social: 'Conéctate con nosotros',
-            socialTxt: 'Tips de limpieza, recetas y promociones exclusivas.',
-            docs: 'Documentos técnicos',
-            docsTxt: 'Descarga las fichas con especificaciones, seguridad y recomendaciones de uso.',
-            docEs: 'Ficha Técnica español',
-            docEn: 'Data Sheet english',
-            buyTitle: 'Compra CTX Grill Degreaser',
-            buyTxt: 'Disponible a solo un click!',
-            buyOnline: 'Comprar en línea',
-            contactSales: 'Contactar ventas',
-            gameWinTitle: '¡Misión cumplida!',
-            gameWinBody: 'Bacterias y grasa eliminadas de la parrilla.',
-            gamePlayAgain: 'Jugar de nuevo',
-            gameTimeUp: 'Se acabó el tiempo.',
-            gameKillsSuffix: 'bacterias eliminadas.',
-            gameRetry: 'Reintentar',
-            contactTitle: '¿Preguntas? ¡Contáctanos!',
-            contactDesc: 'Estamos disponibles para ayudarte con pedidos, distribución y soporte técnico.',
-            callLabel: 'Llamar ahora',
-            smsLabel: 'Enviar SMS'
+            closeMenu: 'Cerrar',
+            heroBadge: 'DESENGRASANTE PROFESIONAL',
+            heroTitle: 'El Poder Cítrico Para Tu <span>Parrilla</span>',
+            heroDesc: 'CTX Grill Degreaser es el desengrasante biodegradable #1 para parrillas, asadores y cocinas comerciales. Fórmula profesional con aroma a toronja que elimina la grasa al instante.',
+            feat1: 'Biodegradable',
+            feat2: 'Aroma Cítrico',
+            feat3: 'Acción Rápida',
+            heroCta1: 'Comprar Ahora',
+            heroCta2: 'Conocer Más',
+            label1: 'Eco-Friendly',
+            label2: 'Poder Toronja',
+            label3: 'Grado Profesional',
+            whatTitle: '¿Qué es CTX Grill Degreaser?',
+            whatDesc: 'Un desengrasante de grado profesional diseñado específicamente para eliminar grasa, aceite y residuos de parrillas, asadores y superficies de cocina.',
+            card1Title: 'Limpieza Profunda',
+            card1Desc: 'Penetra y emulsifica grasas y aceites para un enjuague sin esfuerzo.',
+            card2Title: 'Poder Cítrico',
+            card2Desc: 'Fórmula a base de toronja, segura para uso doméstico o profesional.',
+            card3Title: 'Fácil de Usar',
+            card3Desc: 'Rocía, espera 5–15 minutos, cepilla y enjuaga. ¡Así de simple!',
+            benefitsTitle: 'Beneficios del Producto',
+            benefitsDesc: 'CTX Grill Degreaser ofrece ventajas únicas que lo hacen el mejor desengrasante del mercado.',
+            ben1Title: 'Fórmula Ecológica',
+            ben1Desc: 'A base de agua, libre de COV, plomo y metales pesados.',
+            ben2Title: 'Indicador de Color',
+            ben2Desc: 'Se vuelve blanco al contacto con la grasa para confirmación visual.',
+            ben3Title: 'Aroma Fresco',
+            ben3Desc: 'El aroma a toronja mantiene tu cocina limpia y fresca.',
+            ben4Title: 'Uso Versátil',
+            ben4Desc: 'Perfecto para parrillas, sartenes, hornos, air fryers y más.',
+            usesTitle: '¿Dónde Usar CTX?',
+            usesDesc: 'Diseñado para múltiples superficies y aplicaciones.',
+            use1: '🔥 Parrillas',
+            use2: '🍳 Planchas',
+            use3: '🔥 Estufas',
+            use4: '🥘 Hornos',
+            use5: '🍟 Air Fryers',
+            use6: '🏪 Restaurantes',
+            use7: '🚚 Food Trucks',
+            use8: '🥩 Asadores',
+            gameTitle: '🎮 ¡Prueba el Poder de CTX!',
+            gameDesc: 'Usa el spray para eliminar las bacterias de la parrilla. ¡Tienes 15 segundos!',
+            gameInstructions: '👆 Toca o haz clic y arrastra para rociar',
+            restartText: 'Reiniciar',
+            scoreLabel: 'Kills',
+            gameWin: '<strong>¡Misión cumplida!</strong><br>Bacterias eliminadas.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Jugar de nuevo</a>',
+            gameLose: '¡Tiempo! <strong>{{score}}</strong> bacterias.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Reintentar</a>',
+            gameStart: '👆 Toca para comenzar',
+            galleryTitle: 'Galería de Contenido',
+            galleryDesc: 'Videos con tips de uso, demostraciones y resultados.',
+            contactTitle: '📞 ¿Preguntas? ¡Contáctanos!',
+            contactDesc: 'Estamos disponibles para pedidos, distribución y soporte técnico.',
+            callLabel: 'Llamar',
+            smsLabel: 'SMS',
+            docsTitle: 'Documentos Técnicos',
+            docsDesc: 'Descarga las fichas con especificaciones y recomendaciones.',
+            buyTitle: '¿Listo para una Parrilla Limpia?',
+            buyDesc: 'Compra CTX Grill Degreaser hoy y descubre el poder de la limpieza profesional.',
+            buyCta1: 'Comprar en Línea',
+            buyCta2: 'Contactar Ventas',
+            contactInfo: 'Contacto:',
+            stickyCta1: 'Comprar',
+            stickyCta2: 'Beneficios',
+            footerTagline: 'El poder cítrico para tu parrilla',
+            sheetTitle: 'Beneficios de CTX',
+            sheetClose: 'Cerrar',
+            sheetBen1: '<strong>Limpieza profunda:</strong> Formulado para limpieza intensiva de parrillas y utensilios.',
+            sheetBen2: '<strong>Fórmula ecológica:</strong> A base de agua, libre de COV y metales pesados.',
+            sheetBen3: '<strong>Indicador de color:</strong> Se vuelve blanco al contacto con la grasa.',
+            sheetBen4: '<strong>Aroma cítrico:</strong> El aroma a toronja mantiene tu cocina fresca.',
+            sheetBen5: '<strong>Uso versátil:</strong> Seguro para ti, tus superficies y el medio ambiente.',
         },
         en: {
-            title: 'CTX Grill Degreaser – The best degreaser for your grill',
-            navPlay: 'Play',
-            navDocs: 'Sheets',
+            loaderText: 'LOADING...',
+            navWhat: 'What is it?',
+            navBenefits: 'Benefits',
+            navPlay: 'Game',
             navBuy: 'Buy',
-            kicker: 'The best degreaser for your grill',
-            heroTitle: 'Spray. Aim. <span style="color:var(--primary)">Clean.</span>',
-            lead: 'Professional cleaning for your grill at the reach of a spray!<br>The citrus power that eliminates grease instantly. Safe, eco-friendly and ready to use.',
-            buyNow: 'Buy now',
-            seeBenefits: 'See benefits',
-            startGame: 'Start game',
-            score: 'Kills',
-            restart: 'Restart',
-            p1t: '🔥 Deep Cleaning',
-            p1b: 'Penetrates and emulsifies grease and oils for effortless rinsing.',
-            p2t: '🍊 Citrus Power',
-            p2b: 'Safe and efficient formula for home or professional use.',
-            p3t: '🧽 Easy to Use',
-            p3b: 'Spray, wait 5–15 min, scrub and rinse. Done!',
-            usesTitle: 'Best scenario uses',
-            galeria: 'Content gallery',
-            galeriaTxt: 'Featured videos with usage tips, demos and before/after.',
-            social: 'Connect with us',
-            socialTxt: 'Cleaning tips, recipes and exclusive promotions.',
-            docs: 'Technical documents',
-            docsTxt: 'Download spec sheets, safety and usage recommendations.',
-            docEs: 'Spanish technical sheet',
-            docEn: 'English data sheet',
-            buyTitle: 'Buy CTX Grill Degreaser',
-            buyTxt: 'Available in official channels.',
-            buyOnline: 'Buy online',
-            contactSales: 'Contact sales',
-            gameWinTitle: 'Mission accomplished!',
-            gameWinBody: 'Bacteria and grease removed from the grill.',
-            gamePlayAgain: 'Play again',
-            gameTimeUp: "Time's up.",
-            gameKillsSuffix: 'bacteria eliminated.',
-            gameRetry: 'Try again',
-            contactTitle: 'Questions? Contact us!',
-            contactDesc: 'We\'re here to help with orders, distribution, and technical support.',
-            callLabel: 'Call now',
-            smsLabel: 'Send SMS'
+            closeMenu: 'Close',
+            heroBadge: 'PROFESSIONAL DEGREASER',
+            heroTitle: 'The Citrus Power For Your <span>Grill</span>',
+            heroDesc: 'CTX Grill Degreaser is the #1 biodegradable degreaser for grills, smokers, and commercial kitchens. Professional formula with grapefruit scent that removes grease instantly.',
+            feat1: 'Biodegradable',
+            feat2: 'Citrus Scent',
+            feat3: 'Fast Action',
+            heroCta1: 'Buy Now',
+            heroCta2: 'Learn More',
+            label1: 'Eco-Friendly',
+            label2: 'Grapefruit Power',
+            label3: 'Professional Grade',
+            whatTitle: 'What is CTX Grill Degreaser?',
+            whatDesc: 'A professional-grade degreaser specifically designed to remove grease, oil, and food residue from grills, smokers, and kitchen surfaces.',
+            card1Title: 'Deep Cleaning',
+            card1Desc: 'Penetrates and emulsifies grease and oils for effortless rinsing.',
+            card2Title: 'Citrus Power',
+            card2Desc: 'Grapefruit-based formula, safe for home or professional use.',
+            card3Title: 'Easy to Use',
+            card3Desc: 'Spray, wait 5–15 minutes, scrub and rinse. That simple!',
+            benefitsTitle: 'Product Benefits',
+            benefitsDesc: 'CTX Grill Degreaser offers unique advantages that make it the best degreaser on the market.',
+            ben1Title: 'Eco-Friendly Formula',
+            ben1Desc: 'Water-based, free of VOCs, lead and heavy metals.',
+            ben2Title: 'Color Indicator',
+            ben2Desc: 'Turns white on contact with grease for visual confirmation.',
+            ben3Title: 'Fresh Scent',
+            ben3Desc: 'Grapefruit aroma keeps your kitchen clean and fresh.',
+            ben4Title: 'Versatile Use',
+            ben4Desc: 'Perfect for grills, pans, ovens, air fryers and more.',
+            usesTitle: 'Where to Use CTX?',
+            usesDesc: 'Designed for multiple surfaces and applications.',
+            use1: '🔥 Grills',
+            use2: '🍳 Griddles',
+            use3: '🔥 Stoves',
+            use4: '🥘 Ovens',
+            use5: '🍟 Air Fryers',
+            use6: '🏪 Commercial',
+            use7: '🚚 Food Trucks',
+            use8: '🥩 Smokers',
+            gameTitle: '🎮 Try the Power of CTX!',
+            gameDesc: 'Use the spray to eliminate bacteria from the grill. You have 15 seconds!',
+            gameInstructions: '👆 Tap or click and drag to spray',
+            restartText: 'Restart',
+            scoreLabel: 'Kills',
+            gameWin: '<strong>Mission accomplished!</strong><br>Bacteria eliminated.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Play again</a>',
+            gameLose: "Time's up! <strong>{{score}}</strong> bacteria.<br><a href=\"#\" style=\"color:var(--acid)\" onclick=\"window.startAgain(event)\">Try again</a>",
+            gameStart: '👆 Tap to start',
+            galleryTitle: 'Content Gallery',
+            galleryDesc: 'Videos with usage tips, demos and results.',
+            contactTitle: '📞 Questions? Contact us!',
+            contactDesc: 'We\'re available for orders, distribution and technical support.',
+            callLabel: 'Call',
+            smsLabel: 'SMS',
+            docsTitle: 'Technical Documents',
+            docsDesc: 'Download spec sheets with specifications and recommendations.',
+            buyTitle: 'Ready for a Clean Grill?',
+            buyDesc: 'Buy CTX Grill Degreaser today and discover the power of professional cleaning.',
+            buyCta1: 'Buy Online',
+            buyCta2: 'Contact Sales',
+            contactInfo: 'Contact:',
+            stickyCta1: 'Buy',
+            stickyCta2: 'Benefits',
+            footerTagline: 'The citrus power for your grill',
+            sheetTitle: 'CTX Benefits',
+            sheetClose: 'Close',
+            sheetBen1: '<strong>Deep cleaning:</strong> Formulated for intensive cleaning of grills and utensils.',
+            sheetBen2: '<strong>Eco-friendly formula:</strong> Water-based, free of VOCs and heavy metals.',
+            sheetBen3: '<strong>Color indicator:</strong> Turns white on contact with grease.',
+            sheetBen4: '<strong>Citrus scent:</strong> Grapefruit aroma keeps your kitchen fresh.',
+            sheetBen5: '<strong>Versatile use:</strong> Safe for you, your surfaces and the environment.',
         }
     };
 
-    function setBtnVisual(btnEl, nextLang) {
-        if (!btnEl) return;
-        const isNextEN = nextLang === 'en';
-        btnEl.innerHTML = `<span class="flag" aria-hidden="true">${isNextEN ? US_FLAG : ES_FLAG}</span>
-<span class="label">${isNextEN ? 'EN' : 'ES'}</span>`;
-        btnEl.setAttribute('aria-label', isNextEN ? 'Switch to English (United States)' : 'Cambiar a español');
+    function setBtn(btn, nextLang) {
+        if (!btn) return;
+        const isEN = nextLang === 'en';
+        btn.innerHTML = `<span class="flag">${isEN ? US_FLAG : MX_FLAG}</span><span>${isEN ? 'EN' : 'ES'}</span>`;
+        btn.setAttribute('aria-label', isEN ? 'Switch to English' : 'Cambiar a español');
     }
 
     function apply(lang) {
-        const m = map[lang];
-        document.documentElement.setAttribute('lang', lang === 'en' ? 'en-US' : 'es-ES');
-        document.title = m.title;
-
-        $('#navPlay') && ($('#navPlay').textContent = m.navPlay);
-        $('#navDocs') && ($('#navDocs').textContent = m.navDocs);
-        $('#navBuy') && ($('#navBuy').textContent = m.navBuy);
-
-        // Mobile menu labels
-        $('#mNavPlay') && ($('#mNavPlay').textContent = m.navPlay);
-        $('#mNavDocs') && ($('#mNavDocs').textContent = m.navDocs);
-        $('#mNavBuy') && ($('#mNavBuy').textContent = m.navBuy);
-        $('#mBenefits') && ($('#mBenefits').textContent = m.seeBenefits);
-
-        setBtnVisual($('#langToggle'), lang === 'es' ? 'en' : 'es');
-        setBtnVisual($('#mLangToggle'), lang === 'es' ? 'en' : 'es');
-
-        $('#kicker') && ($('#kicker').textContent = m.kicker);
-        $('#t1') && ($('#t1').innerHTML = m.heroTitle);
-        $('#lead') && ($('#lead').innerHTML = m.lead);
-
-        $('#btnBuyNow') && ($('#btnBuyNow').textContent = m.buyNow);
-        $('#btnBenefits') && ($('#btnBenefits').textContent = m.seeBenefits);
-        $('#btnStart') && ($('#btnStart').textContent = m.startGame);
-
-        window.__scoreLabel = m.score;
-        $('#restartBtn') && ($('#restartBtn').textContent = m.restart);
-        $('#score') && ($('#score').textContent = `${window.__scoreLabel || 'Kills'}: ${window.__score || 0}`);
-
-        $('#p1t') && ($('#p1t').textContent = m.p1t);
-        $('#p1b') && ($('#p1b').textContent = m.p1b);
-        $('#p2t') && ($('#p2t').textContent = m.p2t);
-        $('#p2b') && ($('#p2b').textContent = m.p2b);
-        $('#p3t') && ($('#p3t').textContent = m.p3t);
-        $('#p3b') && ($('#p3b').textContent = m.p3b);
-
-        $('#usesH2') && ($('#usesH2').textContent = m.usesTitle);
-
-        $('#galeria') && ($('#galeria').textContent = m.galeria);
-        $('#galeriaTxt') && ($('#galeriaTxt').textContent = m.galeriaTxt);
-
-        $('#social') && ($('#social').textContent = m.social);
-        $('#socialTxt') && ($('#socialTxt').textContent = m.socialTxt);
-
-        $('#docsH2') && ($('#docsH2').textContent = m.docs);
-        $('#docsTxt') && ($('#docsTxt').textContent = m.docsTxt);
-        $('#docEs') && ($('#docEs').textContent = m.docEs);
-        $('#docEn') && ($('#docEn').textContent = m.docEn);
-
-        $('#buy') && ($('#buy').textContent = m.buyTitle);
-        $('#buyTxt') && ($('#buyTxt').textContent = m.buyTxt);
-        $('#buyOnline') && ($('#buyOnline').textContent = m.buyOnline);
-        $('#contactSales') && ($('#contactSales').textContent = m.contactSales);
-
-        $('#stickyBuy') && ($('#stickyBuy').textContent = m.buyNow);
-        $('#stickyBenefits') && ($('#stickyBenefits').textContent = m.seeBenefits);
-
-        // Contact section translations
-        $('#contactTitleText') && ($('#contactTitleText').textContent = m.contactTitle);
-        $('#contactDesc') && ($('#contactDesc').textContent = m.contactDesc);
-        $('#callLabel') && ($('#callLabel').textContent = m.callLabel);
-        $('#smsLabel') && ($('#smsLabel').textContent = m.smsLabel);
-
+        const m = i18n[lang];
+        document.documentElement.lang = lang === 'en' ? 'en-US' : 'es-ES';
+        const ids = Object.keys(m);
+        ids.forEach(id => {
+            const el = $('#' + id);
+            if (el) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = m[id];
+                else if (id.includes('Title') || id.includes('Desc') || id.includes('Ben') || id === 'heroTitle') el.innerHTML = m[id];
+                else el.textContent = m[id];
+            }
+        });
+        setBtn($('#langToggle'), lang === 'es' ? 'en' : 'es');
+        setBtn($('#mLangToggle'), lang === 'es' ? 'en' : 'es');
+        window.__scoreLabel = m.scoreLabel;
         window.__gameStrings = {
-            winHtml: `<strong>${m.gameWinTitle}</strong><br/>${m.gameWinBody}<br/><a href="#" style="margin-top:6px;display:inline-block" onclick="startAgain(event)">${m.gamePlayAgain}</a>`,
-            loseHtml: `${m.gameTimeUp} <strong>{{score}}</strong> ${m.gameKillsSuffix} <a href="#" style="margin-left:6px" onclick="startAgain(event)">${m.gameRetry}</a>`
+            winHtml: m.gameWin,
+            loseHtml: m.gameLose,
+            startHtml: '👆 ' + (lang === 'es' ? 'Toca para comenzar' : 'Tap to start')
         };
+        $('#score') && ($('#score').textContent = m.scoreLabel + ': ' + (window.__score || 0));
     }
 
-    // initial lang
     const params = new URLSearchParams(location.search);
-    let current = (params.get('lang') && params.get('lang').startsWith('en')) ? 'en' : 'es';
+    let current = params.get('lang')?.startsWith('en') ? 'en' : 'es';
     try {
         const saved = localStorage.getItem('ctx-lang');
         if (saved === 'en' || saved === 'es') current = saved;
     } catch (e) { }
 
+    // IP-based language detection for first-time visitors
+    async function detectByIP() {
+        try {
+            const saved = localStorage.getItem('ctx-lang');
+            if (saved) return; // Don't override saved preference
+            const resp = await fetch('https://ipapi.co/json/');
+            const data = await resp.json();
+            const spanishCountries = ['MX', 'ES', 'AR', 'CO', 'PE', 'VE', 'CL', 'EC', 'GT', 'CU', 'BO', 'DO', 'HN', 'PY', 'SV', 'NI', 'CR', 'PA', 'UY', 'PR'];
+            if (spanishCountries.includes(data.country_code)) {
+                current = 'es';
+            } else {
+                current = 'en';
+            }
+            apply(current);
+        } catch (e) {
+            // Fallback to browser language
+            const browserLang = navigator.language || 'en';
+            if (browserLang.startsWith('es')) current = 'es';
+            else current = 'en';
+            apply(current);
+        }
+    }
+
+    detectByIP();
     apply(current);
 
     function toggle() {
-        current = (current === 'es') ? 'en' : 'es';
+        current = current === 'es' ? 'en' : 'es';
         apply(current);
         try {
             localStorage.setItem('ctx-lang', current);
@@ -918,11 +878,11 @@ document.getElementById('year').textContent = new Date().getFullYear();
         history.replaceState(null, '', url.toString());
     }
 
-    $('#langToggle')?.addEventListener('click', (e) => {
+    $('#langToggle')?.addEventListener('click', e => {
         e.preventDefault();
         toggle();
     });
-    $('#mLangToggle')?.addEventListener('click', (e) => {
+    $('#mLangToggle')?.addEventListener('click', e => {
         e.preventDefault();
         toggle();
     });
