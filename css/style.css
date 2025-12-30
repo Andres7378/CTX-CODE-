@@ -551,7 +551,7 @@ header.scrolled {
     .hero-desc { margin-inline: auto; }
     .hero-features { justify-content: center; }
     .hero-cta { justify-content: center; }
-     { max-width: 260px; }
+    .hero-cta { max-width: 260px; }
     .product-label { display: none; }
 }
 
