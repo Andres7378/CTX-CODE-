@@ -149,8 +149,11 @@ header.scrolled {
     font-weight: 700;
 }
 
+/* FIX: Logo — added width: auto and object-fit: contain to prevent compression */
 .logo-img {
     height: 50px;
+    width: auto;
+    object-fit: contain;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .4));
 }
 
@@ -852,45 +855,133 @@ canvas#arena {
 }
 
 /* ==========================================
-   Gallery Section
+   Gallery Section — Carousel
    ========================================== */
 .gallery-section {
     padding: 70px 0;
 }
 
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 14px;
-    margin-top: 35px;
+.carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.gallery-tile {
-    grid-column: span 6;
+.carousel-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 10px 0 20px;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-slide {
+    flex: 0 0 min(100%, 420px);
+    scroll-snap-align: center;
     background: var(--panel);
     border: 1px solid rgba(255, 255, 255, .06);
     border-radius: 18px;
-    min-height: 280px;
+    min-height: 500px;
     padding: 14px;
     display: grid;
     place-items: center;
     overflow: hidden;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all .5s;
 }
 
-.gallery-tile.visible {
-    opacity: 1;
-    transform: translateY(0);
+.carousel-arrow {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .15);
+    background: rgba(18, 18, 26, .85);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .25s;
+    z-index: 2;
 }
 
-.gallery-tile.large {
-    grid-column: span 12;
+.carousel-arrow:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.08);
 }
 
-@media (max-width: 768px) {
-    .gallery-tile { grid-column: span 12; }
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, .15);
+    cursor: pointer;
+    transition: all .25s;
+    padding: 0;
+}
+
+.carousel-dot.active {
+    background: var(--primary);
+    transform: scale(1.25);
+}
+
+/* Instagram CTA card */
+.instagram-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    text-decoration: none;
+    color: var(--ink);
+    background: linear-gradient(135deg, rgba(131,58,180,.12), rgba(253,29,29,.12), rgba(252,176,69,.12));
+    border-radius: 14px;
+    transition: all .3s;
+}
+
+.instagram-cta:hover {
+    background: linear-gradient(135deg, rgba(131,58,180,.22), rgba(253,29,29,.22), rgba(252,176,69,.22));
+    transform: scale(1.02);
+}
+
+.ig-icon {
+    color: var(--primary);
+}
+
+.ig-handle {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+}
+
+.ig-label {
+    font-size: .9rem;
+    color: var(--muted);
+}
+
+@media (max-width: 600px) {
+    .carousel-arrow { display: none; }
+    .carousel-slide { flex: 0 0 85vw; }
 }
 
 /* ==========================================

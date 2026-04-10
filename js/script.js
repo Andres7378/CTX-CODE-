@@ -1,6 +1,6 @@
 /* ==========================================
    CTX Grill Degreaser - Main JavaScript
-   Version 2.1 - Full i18n Fix
+   Version 2.2 - Carousel + i18n Fix
    ========================================== */
 
 /* ==========================================
@@ -33,7 +33,7 @@ const revealObserver = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-document.querySelectorAll('.scroll-reveal, .what-card, .benefit-item, .use-chip, .gallery-tile').forEach(el => {
+document.querySelectorAll('.scroll-reveal, .what-card, .benefit-item, .use-chip').forEach(el => {
     revealObserver.observe(el);
 });
 
@@ -574,6 +574,67 @@ document.getElementById('year').textContent = new Date().getFullYear();
 })();
 
 /* ==========================================
+   SECTION 8b: Gallery Carousel
+   ========================================== */
+(function() {
+    const track = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    const dotsWrap = document.getElementById('carouselDots');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.carousel-slide');
+    const count = slides.length;
+
+    /* Build dots */
+    slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+        dot.addEventListener('click', () => scrollToSlide(i));
+        dotsWrap.appendChild(dot);
+    });
+
+    const dots = dotsWrap.querySelectorAll('.carousel-dot');
+
+    function scrollToSlide(i) {
+        slides[i]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    function getActiveIndex() {
+        const trackRect = track.getBoundingClientRect();
+        const center = trackRect.left + trackRect.width / 2;
+        let closest = 0, minDist = Infinity;
+        slides.forEach((s, i) => {
+            const r = s.getBoundingClientRect();
+            const dist = Math.abs(r.left + r.width / 2 - center);
+            if (dist < minDist) { minDist = dist; closest = i; }
+        });
+        return closest;
+    }
+
+    function updateDots() {
+        const idx = getActiveIndex();
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
+    prevBtn?.addEventListener('click', () => {
+        const idx = getActiveIndex();
+        scrollToSlide(Math.max(0, idx - 1));
+    });
+
+    nextBtn?.addEventListener('click', () => {
+        const idx = getActiveIndex();
+        scrollToSlide(Math.min(count - 1, idx + 1));
+    });
+
+    track.addEventListener('scroll', () => {
+        clearTimeout(track._scrollTimer);
+        track._scrollTimer = setTimeout(updateDots, 80);
+    }, { passive: true });
+})();
+
+/* ==========================================
    SECTION 9: Internationalization (i18n)
    ========================================== */
 (function() {
@@ -584,9 +645,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
     const i18n = {
         es: {
-            /* ---- Loader ---- */
             loaderText: 'CARGANDO...',
-            /* ---- Nav ---- */
             navWhat: '¿Qué es?',
             navBenefits: 'Beneficios',
             navPlay: 'Juego',
@@ -596,7 +655,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             mNavPlay: 'Juego',
             mNavBuy: 'Comprar',
             closeMenu: 'Cerrar',
-            /* ---- Hero ---- */
             heroBadge: 'DESENGRASANTE PROFESIONAL',
             heroTitle: 'El Poder Cítrico Para Tu <span>Parrilla</span>',
             heroDesc: 'CTX Grill Degreaser es el desengrasante biodegradable #1 para parrillas, asadores y cocinas comerciales. Fórmula profesional con aroma a toronja que elimina la grasa al instante.',
@@ -608,7 +666,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             label1: 'Eco-Friendly',
             label2: 'Poder Toronja',
             label3: 'Grado Profesional',
-            /* ---- What Is ---- */
             whatTitle: '¿Qué es CTX Grill Degreaser?',
             whatDesc: 'Un desengrasante de grado profesional diseñado específicamente para eliminar grasa, aceite y residuos de parrillas, asadores y superficies de cocina.',
             card1Title: 'Limpieza Profunda',
@@ -617,7 +674,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             card2Desc: 'Fórmula a base de toronja, segura para uso doméstico o profesional.',
             card3Title: 'Fácil de Usar',
             card3Desc: 'Rocía, espera 5–15 minutos, cepilla y enjuaga. ¡Así de simple!',
-            /* ---- Benefits ---- */
             benefitsTitle: 'Beneficios del Producto',
             benefitsDesc: 'CTX Grill Degreaser ofrece ventajas únicas que lo hacen el mejor desengrasante del mercado.',
             ben1Title: 'Fórmula Ecológica',
@@ -628,7 +684,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             ben3Desc: 'El aroma a toronja mantiene tu cocina limpia y fresca.',
             ben4Title: 'Uso Versátil',
             ben4Desc: 'Perfecto para parrillas, sartenes, hornos, air fryers y más.',
-            /* ---- Uses ---- */
             usesTitle: '¿Dónde Usar CTX Grill Degreaser?',
             usesDesc: 'Diseñado para múltiples superficies y aplicaciones.',
             use1: '🔥 Parrillas',
@@ -639,7 +694,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             use6: '🏪 Restaurantes',
             use7: '🚚 Food Trucks',
             use8: '🥩 Asadores',
-            /* ---- FAQ ---- */
             faqHeading: 'Preguntas Frecuentes',
             faqDesc: 'Todo lo que necesitas saber sobre CTX Grill Degreaser.',
             faq1Q: '¿Es seguro para superficies de cocina?',
@@ -648,7 +702,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             faq2A: 'Rocía, espera 5–15 minutos, cepilla y enjuaga. El indicador de color cambia a blanco al contactar la grasa.',
             faq3Q: '¿Dónde comprarlo?',
             faq3A: 'Disponible en línea en <a href="https://campsite.bio/ctxshop" target="_blank" rel="noopener noreferrer" style="color:var(--acid)">campsite.bio/ctxshop</a>. Para mayoreo contacta al (832) 948-6169.',
-            /* ---- Game ---- */
             gameTitle: '🎮 ¡Prueba el Poder de CTX!',
             gameDesc: 'Usa el spray para eliminar las bacterias de la parrilla. ¡Tienes 15 segundos!',
             gameInstructions: '👆 Toca o haz clic y arrastra para rociar',
@@ -657,28 +710,23 @@ document.getElementById('year').textContent = new Date().getFullYear();
             gameWin: '<strong>¡Misión cumplida!</strong><br>Bacterias eliminadas.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Jugar de nuevo</a>',
             gameLose: '¡Tiempo! <strong>{{score}}</strong> bacterias.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Reintentar</a>',
             gameStart: '👆 Toca para comenzar',
-            /* ---- Gallery ---- */
             galleryTitle: 'Galería de Contenido',
             galleryDesc: 'Videos con tips de uso, demostraciones y resultados.',
-            /* ---- Contact ---- */
+            igLabel: 'Síguenos en Instagram',
             contactTitle: '📞 ¿Preguntas? ¡Contáctanos!',
             contactDesc: 'Estamos disponibles para pedidos, distribución y soporte técnico.',
             callLabel: 'Llamar',
             smsLabel: 'SMS',
-            /* ---- Docs ---- */
             docsTitle: 'Documentos Técnicos',
             docsDesc: 'Descarga las fichas con especificaciones y recomendaciones.',
-            /* ---- Buy ---- */
             buyTitle: '¿Listo para una Parrilla Limpia?',
             buyDesc: 'Compra CTX Grill Degreaser hoy y descubre el poder de la limpieza profesional.',
             buyCta1: 'Comprar en Línea',
             buyCta2: 'Contactar Ventas',
             contactInfo: 'Contacto:',
-            /* ---- Sticky / Footer ---- */
             stickyCta1: 'Comprar',
             stickyCta2: 'Beneficios',
             footerTagline: 'El poder cítrico para tu parrilla',
-            /* ---- Benefits Sheet ---- */
             sheetTitle: 'Beneficios de CTX',
             closeBeneficios: 'Cerrar',
             sheetBen1: '<strong>Limpieza profunda:</strong> Formulado para limpieza intensiva de parrillas y utensilios.',
@@ -688,9 +736,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             sheetBen5: '<strong>Uso versátil:</strong> Seguro para ti, tus superficies y el medio ambiente.',
         },
         en: {
-            /* ---- Loader ---- */
             loaderText: 'LOADING...',
-            /* ---- Nav ---- */
             navWhat: 'What is it?',
             navBenefits: 'Benefits',
             navPlay: 'Game',
@@ -700,7 +746,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             mNavPlay: 'Game',
             mNavBuy: 'Buy',
             closeMenu: 'Close',
-            /* ---- Hero ---- */
             heroBadge: 'PROFESSIONAL DEGREASER',
             heroTitle: 'The Citrus Power For Your <span>Grill</span>',
             heroDesc: 'CTX Grill Degreaser is the #1 biodegradable degreaser for grills, smokers, and commercial kitchens. Professional formula with grapefruit scent that removes grease instantly.',
@@ -712,7 +757,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             label1: 'Eco-Friendly',
             label2: 'Grapefruit Power',
             label3: 'Professional Grade',
-            /* ---- What Is ---- */
             whatTitle: 'What is CTX Grill Degreaser?',
             whatDesc: 'A professional-grade degreaser specifically designed to remove grease, oil, and food residue from grills, smokers, and kitchen surfaces.',
             card1Title: 'Deep Cleaning',
@@ -721,7 +765,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             card2Desc: 'Grapefruit-based formula, safe for home or professional use.',
             card3Title: 'Easy to Use',
             card3Desc: 'Spray, wait 5–15 minutes, scrub and rinse. That simple!',
-            /* ---- Benefits ---- */
             benefitsTitle: 'Product Benefits',
             benefitsDesc: 'CTX Grill Degreaser offers unique advantages that make it the best degreaser on the market.',
             ben1Title: 'Eco-Friendly Formula',
@@ -732,7 +775,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             ben3Desc: 'Grapefruit aroma keeps your kitchen clean and fresh.',
             ben4Title: 'Versatile Use',
             ben4Desc: 'Perfect for grills, pans, ovens, air fryers and more.',
-            /* ---- Uses ---- */
             usesTitle: 'Where to Use CTX Grill Degreaser?',
             usesDesc: 'Designed for multiple surfaces and applications.',
             use1: '🔥 Grills',
@@ -743,7 +785,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             use6: '🏪 Commercial',
             use7: '🚚 Food Trucks',
             use8: '🥩 Smokers',
-            /* ---- FAQ ---- */
             faqHeading: 'Frequently Asked Questions',
             faqDesc: 'Everything you need to know about CTX Grill Degreaser.',
             faq1Q: 'Is it safe for kitchen surfaces?',
@@ -752,7 +793,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
             faq2A: 'Spray, wait 5–15 minutes, scrub and rinse. The color-change indicator turns white on contact with grease.',
             faq3Q: 'Where can I buy it?',
             faq3A: 'Available online at <a href="https://campsite.bio/ctxshop" target="_blank" rel="noopener noreferrer" style="color:var(--acid)">campsite.bio/ctxshop</a>. For wholesale orders call (832) 948-6169.',
-            /* ---- Game ---- */
             gameTitle: '🎮 Try the Power of CTX!',
             gameDesc: 'Use the spray to eliminate bacteria from the grill. You have 15 seconds!',
             gameInstructions: '👆 Tap or click and drag to spray',
@@ -761,28 +801,23 @@ document.getElementById('year').textContent = new Date().getFullYear();
             gameWin: '<strong>Mission accomplished!</strong><br>Bacteria eliminated.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Play again</a>',
             gameLose: "Time's up! <strong>{{score}}</strong> bacteria.<br><a href=\"#\" style=\"color:var(--acid)\" onclick=\"window.startAgain(event)\">Try again</a>",
             gameStart: '👆 Tap to start',
-            /* ---- Gallery ---- */
             galleryTitle: 'Content Gallery',
             galleryDesc: 'Videos with usage tips, demos and results.',
-            /* ---- Contact ---- */
+            igLabel: 'Follow us on Instagram',
             contactTitle: '📞 Questions? Contact Us!',
             contactDesc: "We're available for orders, distribution and technical support.",
             callLabel: 'Call',
             smsLabel: 'SMS',
-            /* ---- Docs ---- */
             docsTitle: 'Technical Documents',
             docsDesc: 'Download spec sheets with specifications and recommendations.',
-            /* ---- Buy ---- */
             buyTitle: 'Ready for a Clean Grill?',
             buyDesc: 'Buy CTX Grill Degreaser today and discover the power of professional cleaning.',
             buyCta1: 'Buy Online',
             buyCta2: 'Contact Sales',
             contactInfo: 'Contact:',
-            /* ---- Sticky / Footer ---- */
             stickyCta1: 'Buy',
             stickyCta2: 'Benefits',
             footerTagline: 'The citrus power for your grill',
-            /* ---- Benefits Sheet ---- */
             sheetTitle: 'CTX Benefits',
             closeBeneficios: 'Close',
             sheetBen1: '<strong>Deep cleaning:</strong> Formulated for intensive cleaning of grills and utensils.',
@@ -793,7 +828,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
         }
     };
 
-    /* Keys that contain HTML (use innerHTML) */
     const HTML_KEYS = new Set([
         'heroTitle','sheetBen1','sheetBen2','sheetBen3','sheetBen4','sheetBen5',
         'faq1A','faq2A','faq3A',
@@ -842,7 +876,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
         if (scoreEl) scoreEl.textContent = m.scoreLabel + ': ' + (window.__score || 0);
     }
 
-    /* Determine initial language */
     const params = new URLSearchParams(location.search);
     let current = params.get('lang')?.startsWith('en') ? 'en' : 'es';
     try {
@@ -850,7 +883,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
         if (saved === 'en' || saved === 'es') current = saved;
     } catch (e) { }
 
-    /* IP-based detection for first-time visitors */
     async function detectByIP() {
         try {
             const saved = localStorage.getItem('ctx-lang');

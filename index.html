@@ -48,8 +48,6 @@
 
 <!-- ============================================================
      CANONICAL & HREFLANG
-     FIX: Was pointing to ctxgrilldegreaser.com — now corrected to ctxgrill.com
-     This was causing the wrong URL to appear when sharing on mobile.
      ============================================================ -->
 <link rel="canonical" href="https://www.ctxgrill.com/" />
 <link rel="alternate" hreflang="en" href="https://www.ctxgrill.com/?lang=en" />
@@ -59,9 +57,7 @@
 <link rel="alternate" hreflang="x-default" href="https://www.ctxgrill.com/" />
 
 <!-- ============================================================
-     OPEN GRAPH — Controls WhatsApp, iMessage, Facebook, Instagram previews
-     FIX: og:url was ctxgrilldegreaser.com → now ctxgrill.com
-     FIX: og:image now uses absolute ctxgrill.com path
+     OPEN GRAPH
      ============================================================ -->
 <meta property="og:type" content="product" />
 <meta property="og:site_name" content="CTX Grill Degreaser" />
@@ -76,7 +72,7 @@
 <meta property="og:locale:alternate" content="en_US" />
 <meta property="og:locale:alternate" content="es_MX" />
 
-<!-- Product-specific OG tags (Facebook catalog, Pinterest) -->
+<!-- Product-specific OG tags -->
 <meta property="product:price:amount" content="" />
 <meta property="product:price:currency" content="USD" />
 <meta property="product:availability" content="in stock" />
@@ -85,7 +81,6 @@
 
 <!-- ============================================================
      TWITTER / X CARD
-     FIX: image URL corrected to ctxgrill.com
      ============================================================ -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@CTXGrill" />
@@ -96,8 +91,6 @@
 
 <!-- ============================================================
      STRUCTURED DATA (JSON-LD)
-     Added: Product, FAQPage, LocalBusiness, BreadcrumbList, WebSite
-     FIX: All URLs corrected to ctxgrill.com
      ============================================================ -->
 <script type="application/ld+json">
 {
@@ -279,7 +272,7 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<!-- Sitemap hint (create /sitemap.xml — see notes below) -->
+<!-- Sitemap hint -->
 <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
 <!-- External CSS -->
@@ -330,17 +323,13 @@
 
 <main id="top">
 
-  <!-- ======================================================
-       HERO
-       SEO: h1 includes primary keyword naturally
-       ====================================================== -->
-  <section class="hero" aria-labelledby="heroHeading">
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="heroTitle">
     <div class="container hero-grid">
       <div class="hero-content">
         <div class="hero-badge"><span class="dot" aria-hidden="true"></span><span id="heroBadge">DESENGRASANTE PROFESIONAL</span></div>
 
-        <!-- h1 — primary keyword anchor: "CTX Grill Degreaser" + "limpiador de parrilla" / "grill cleaner" -->
-        <h1 id="heroHeading" id="heroTitle">El Poder Cítrico Para Tu <span>Parrilla</span></h1>
+        <h1 id="heroTitle">El Poder Cítrico Para Tu <span>Parrilla</span></h1>
 
         <p class="hero-desc" id="heroDesc">
           CTX Grill Degreaser es el desengrasante biodegradable #1 para parrillas, asadores y cocinas comerciales.
@@ -376,13 +365,11 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       WHAT IS — Secondary keyword section
-       ====================================================== -->
-  <section class="what-is" id="que-es" aria-labelledby="whatHeading">
+  <!-- WHAT IS -->
+  <section class="what-is" id="que-es" aria-labelledby="whatTitle">
     <div class="container">
       <div class="section-header scroll-reveal">
-        <h2 id="whatHeading" id="whatTitle">¿Qué es CTX Grill Degreaser?</h2>
+        <h2 id="whatTitle">¿Qué es CTX Grill Degreaser?</h2>
         <p id="whatDesc">Un desengrasante de grado profesional diseñado específicamente para eliminar grasa, aceite y residuos de parrillas, asadores y superficies de cocina.</p>
       </div>
       <div class="what-grid">
@@ -405,13 +392,11 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       BENEFITS
-       ====================================================== -->
-  <section class="benefits-section" id="beneficios" aria-labelledby="benefitsHeading">
+  <!-- BENEFITS -->
+  <section class="benefits-section" id="beneficios" aria-labelledby="benefitsTitle">
     <div class="container">
       <div class="section-header scroll-reveal">
-        <h2 id="benefitsHeading" id="benefitsTitle">Beneficios del Producto</h2>
+        <h2 id="benefitsTitle">Beneficios del Producto</h2>
         <p id="benefitsDesc">CTX Grill Degreaser ofrece ventajas únicas que lo hacen el mejor desengrasante del mercado.</p>
       </div>
       <div class="benefits-grid">
@@ -460,13 +445,11 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       USES — keyword-rich chips with semantic HTML
-       ====================================================== -->
-  <section class="uses-section" aria-labelledby="usesHeading">
+  <!-- USES -->
+  <section class="uses-section" aria-labelledby="usesTitle">
     <div class="container">
       <div class="section-header scroll-reveal">
-        <h2 id="usesHeading" id="usesTitle">¿Dónde Usar CTX Grill Degreaser?</h2>
+        <h2 id="usesTitle">¿Dónde Usar CTX Grill Degreaser?</h2>
         <p id="usesDesc">Diseñado para múltiples superficies y aplicaciones.</p>
       </div>
       <div class="uses-chips" role="list">
@@ -482,10 +465,7 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       FAQ SECTION — targets "People Also Ask" in Google
-       All elements have IDs so i18n can translate them
-       ====================================================== -->
+  <!-- FAQ -->
   <section class="what-is" id="faq" aria-labelledby="faqHeading">
     <div class="container">
       <div class="section-header scroll-reveal">
@@ -519,13 +499,11 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       GAME
-       ====================================================== -->
-  <section class="game-section" id="juego" aria-labelledby="gameHeading">
+  <!-- GAME -->
+  <section class="game-section" id="juego" aria-labelledby="gameTitle">
     <div class="container">
       <div class="game-intro scroll-reveal">
-        <h2 id="gameHeading" id="gameTitle">🎮 ¡Prueba el Poder de CTX!</h2>
+        <h2 id="gameTitle">🎮 ¡Prueba el Poder de CTX!</h2>
         <p id="gameDesc">Usa el spray para eliminar las bacterias de la parrilla. ¡Tienes 15 segundos!</p>
       </div>
       <div class="playcard" id="arena-wrap" role="application" aria-label="CTX Grill Degreaser game — spray bacteria off the grill">
@@ -542,41 +520,74 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       GALLERY
-       ====================================================== -->
-  <section class="gallery-section" aria-labelledby="galleryHeading">
+  <!-- GALLERY — Carousel -->
+  <section class="gallery-section" aria-labelledby="galleryTitle">
     <div class="container">
       <div class="section-header scroll-reveal">
-        <h2 id="galleryHeading" id="galleryTitle">Galería de Contenido</h2>
+        <h2 id="galleryTitle">Galería de Contenido</h2>
         <p id="galleryDesc">Videos con tips de uso, demostraciones y resultados.</p>
       </div>
-      <div class="gallery-grid">
-        <div class="gallery-tile large" data-delay="0">
-          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@panzontogo/video/7551285276622982408" data-video-id="7551285276622982408" style="max-width:780px;min-width:288px;width:100%">
-            <section><a target="_blank" href="https://www.tiktok.com/@panzontogo?refer=embed">@panzontogo</a></section>
-          </blockquote>
+      <div class="carousel" id="galleryCarousel">
+        <button class="carousel-arrow carousel-arrow--left" id="carouselPrev" aria-label="Previous slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="carousel-track" id="carouselTrack">
+
+          <!-- Slide 1 -->
+          <div class="carousel-slide">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@panzontogo/video/7551285276622982408" data-video-id="7551285276622982408" style="max-width:605px;min-width:288px;width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@panzontogo?refer=embed">@panzontogo</a></section>
+            </blockquote>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="carousel-slide">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@capitancocinero/video/7560869991776537874" data-video-id="7560869991776537874" style="max-width:605px;min-width:288px;width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@capitancocinero?refer=embed">@capitancocinero</a></section>
+            </blockquote>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="carousel-slide">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@chefchristian.herrera/video/7548860447517166866" data-video-id="7548860447517166866" style="max-width:605px;min-width:288px;width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@chefchristian.herrera?refer=embed">@chefchristian.herrera</a></section>
+            </blockquote>
+          </div>
+
+          <!-- Slide 4 -->
+          <div class="carousel-slide">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@panzontogo/video/7579045314858962197" data-video-id="7579045314858962197" style="max-width:605px;min-width:288px;width:100%">
+              <section><a target="_blank" href="https://www.tiktok.com/@panzontogo?refer=embed">@panzontogo</a></section>
+            </blockquote>
+          </div>
+
+          <!-- Slide 5 — Instagram CTA -->
+          <div class="carousel-slide">
+            <a class="instagram-cta" href="https://www.instagram.com/ctxgrilldegreaser/" target="_blank" rel="noopener noreferrer">
+              <div class="ig-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+              </div>
+              <span class="ig-handle">@ctxgrilldegreaser</span>
+              <span class="ig-label" id="igLabel">Síguenos en Instagram</span>
+            </a>
+          </div>
+
         </div>
-        <div class="gallery-tile" data-delay="100">
-          <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DPxSDcHj9Cu/?utm_source=ig_embed" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:12px;margin:0;max-width:540px;min-width:326px;padding:0;width:100%"></blockquote>
-        </div>
-        <div class="gallery-tile" data-delay="200">
-          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@chefchristian.herrera/video/7548860447517166866" data-video-id="7548860447517166866" style="max-width:780px;min-width:288px;width:100%">
-            <section><a target="_blank" href="https://www.tiktok.com/@chefchristian.herrera?refer=embed">@chefchristian.herrera</a></section>
-          </blockquote>
-        </div>
+        <button class="carousel-arrow carousel-arrow--right" id="carouselNext" aria-label="Next slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
+      <!-- Dots -->
+      <div class="carousel-dots" id="carouselDots"></div>
     </div>
   </section>
 
-  <!-- ======================================================
-       CONTACT
-       ====================================================== -->
-  <section class="contact-section" aria-labelledby="contactHeading">
+  <!-- CONTACT -->
+  <section class="contact-section" aria-labelledby="contactTitle">
     <div class="container">
       <div class="contact-card scroll-reveal">
         <div class="contact-info">
-          <h2 id="contactHeading" id="contactTitle">📞 ¿Preguntas? ¡Contáctanos!</h2>
+          <h2 id="contactTitle">📞 ¿Preguntas? ¡Contáctanos!</h2>
           <p id="contactDesc">Estamos disponibles para pedidos, distribución y soporte técnico.</p>
         </div>
         <div class="contact-actions">
@@ -593,13 +604,11 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       DOCS
-       ====================================================== -->
-  <section class="docs-section" id="docs" aria-labelledby="docsHeading">
+  <!-- DOCS -->
+  <section class="docs-section" id="docs" aria-labelledby="docsTitle">
     <div class="container">
       <div class="section-header scroll-reveal">
-        <h2 id="docsHeading" id="docsTitle">Documentos Técnicos</h2>
+        <h2 id="docsTitle">Documentos Técnicos</h2>
         <p id="docsDesc">Descarga las fichas con especificaciones y recomendaciones.</p>
       </div>
       <div class="docs-grid">
@@ -613,20 +622,18 @@
     </div>
   </section>
 
-  <!-- ======================================================
-       BUY CTA
-       ====================================================== -->
-  <section class="buy-section" id="comprar" aria-labelledby="buyHeading">
+  <!-- BUY CTA -->
+  <section class="buy-section" id="comprar" aria-labelledby="buyTitle">
     <div class="container buy-content scroll-reveal">
-      <h2 id="buyHeading" id="buyTitle">¿Listo para una Parrilla Limpia?</h2>
+      <h2 id="buyTitle">¿Listo para una Parrilla Limpia?</h2>
       <p id="buyDesc">Compra CTX Grill Degreaser hoy y descubre el poder de la limpieza profesional.</p>
       <div class="buy-cta">
         <a class="btn" href="https://campsite.bio/ctxshop" target="_blank" rel="noopener noreferrer" id="buyCta1">Comprar en Línea</a>
-        <a class="btn ghost" href="/cdn-cgi/l/email-protection#93f2e3f2f7fafffff2d3f1fff6fdf7f6e1f4e1fce6e3bdf0fcfe" id="buyCta2">Contactar Ventas</a>
+        <a class="btn ghost" href="/cdn-cgi/l/email-protection#f2938293969b9e9e93b2909e979c96978095809d87829c919d9f" id="buyCta2">Contactar Ventas</a>
       </div>
       <p style="margin-top:18px;font-size:.85rem">
         <span id="contactInfo">Contacto:</span>
-        <a href="/cdn-cgi/l/email-protection#06677667626f6a6a6746646a636862637461746973762865696b" style="color:var(--primary)"><span class="__cf_email__" data-cfemail="24455445404d484845644648414a40415643564b51540a474b49">[email&#160;protected]</span></a>
+        <a href="/cdn-cgi/l/email-protection#06677667626f6a6a6746646a636862637461746b51540a474b49" style="color:var(--primary)"><span class="__cf_email__" data-cfemail="24455445404d484845644648414a40415643564b51540a474b49">[email&#160;protected]</span></a>
         ·
         <a href="tel:+18329486169" style="color:var(--acid)">+1 (832) 948-6169</a>
       </p>
@@ -680,4 +687,10 @@
 (function(){
   window.addEventListener('load', function() {
     if(!document.querySelector('script[src*="tiktok.com/embed.js"]')){
-      var s=document.createElement('script');s.async=true;s.src='https://www.tiktok.
+      var s=document.createElement('script');s.async=true;s.src='https://www.tiktok.com/embed.js';document.body.appendChild(s);
+    }
+  });
+})();
+</script>
+</body>
+</html>
