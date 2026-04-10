@@ -1,6 +1,6 @@
 /* ==========================================
    CTX Grill Degreaser - Main JavaScript
-   Version 2.0 - Redesigned
+   Version 2.1 - Full i18n Fix
    ========================================== */
 
 /* ==========================================
@@ -330,10 +330,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
         ctx.drawImage(dirtCanvas, 0, 0);
 
         for (const b of bacteria) {
-            if (b.dead) {
-                b.life -= 0.05;
-                continue;
-            }
+            if (b.dead) { b.life -= 0.05; continue; }
             b.x += b.vx;
             b.y += b.vy;
             if (b.x < b.r || b.x > W - b.r) b.vx *= -1;
@@ -342,11 +339,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
         if (spraying) spray();
 
-        for (const p of particles) {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= 0.03;
-        }
+        for (const p of particles) { p.x += p.vx; p.y += p.vy; p.life -= 0.03; }
         particles = particles.filter(p => p.life > 0);
 
         for (const b of bacteria) {
@@ -383,10 +376,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
         }
 
         for (const c of confetti) {
-            c.vy += 0.1;
-            c.x += c.vx;
-            c.y += c.vy;
-            c.life -= 0.01;
+            c.vy += 0.1; c.x += c.vx; c.y += c.vy; c.life -= 0.01;
             ctx.globalAlpha = Math.max(c.life, 0);
             ctx.fillStyle = c.color;
             ctx.fillRect(c.x, c.y, c.w, c.h);
@@ -411,14 +401,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
             time -= 1 / 60;
             if (time < 0) time = 0;
             const alive = bacteria.some(b => !b.dead);
-            if (!alive) {
-                celebrate();
-                return;
-            }
-            if (time === 0) {
-                endGame();
-                return;
-            }
+            if (!alive) { celebrate(); return; }
+            if (time === 0) { endGame(); return; }
         }
 
         timerEl.textContent = '00:' + ('0' + Math.floor(time)).slice(-2);
@@ -426,26 +410,17 @@ document.getElementById('year').textContent = new Date().getFullYear();
     }
 
     function celebrate() {
-        state = 'won';
-        started = false;
-        won = true;
+        state = 'won'; started = false; won = true;
         cancelAnimationFrame(raf);
         dirtCtx.clearRect(0, 0, W, H);
-        shine = 0;
-        particles = [];
-        spraying = false;
-        stopSpray();
+        shine = 0; particles = []; spraying = false; stopSpray();
         const count = isMobile ? 70 : 100;
         for (let i = 0; i < count; i++) {
             confetti.push({
-                x: rand(0, W),
-                y: rand(-30, 15),
-                vx: rand(-1.2, 1.2),
-                vy: rand(1, 2.5),
-                w: rand(4, 7),
-                h: rand(7, 12),
-                color: `hsl(${rand(300, 360)},85%,60%)`,
-                life: 1
+                x: rand(0, W), y: rand(-30, 15),
+                vx: rand(-1.2, 1.2), vy: rand(1, 2.5),
+                w: rand(4, 7), h: rand(7, 12),
+                color: `hsl(${rand(300, 360)},85%,60%)`, life: 1
             });
         }
         playWin();
@@ -455,20 +430,12 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
     function startGame(force) {
         wrap.querySelectorAll('.game-msg').forEach(el => el.remove());
-        won = false;
-        started = true;
-        state = 'playing';
-        score = 0;
-        time = 15;
-        window.__score = 0;
+        won = false; started = true; state = 'playing';
+        score = 0; time = 15; window.__score = 0;
         scoreEl.textContent = (window.__scoreLabel || 'Kills') + ': 0';
         timerEl.textContent = '00:15';
-        particles = [];
-        confetti = [];
-        spawnBacteria();
-        drawDirt();
-        spraying = false;
-        stopSpray();
+        particles = []; confetti = [];
+        spawnBacteria(); drawDirt(); spraying = false; stopSpray();
         if (!gameReady || force) {
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(update);
@@ -477,11 +444,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
     }
 
     function endGame() {
-        state = 'lost';
-        started = false;
-        won = false;
-        cancelAnimationFrame(raf);
-        stopSpray();
+        state = 'lost'; started = false; won = false;
+        cancelAnimationFrame(raf); stopSpray();
         const gs = window.__gameStrings || {};
         showMsg(gs.loseHtml?.replace('{{score}}', score) || `¡Tiempo! <strong>${score}</strong> bacterias.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Reintentar</a>`);
         raf = requestAnimationFrame(update);
@@ -491,27 +455,16 @@ document.getElementById('year').textContent = new Date().getFullYear();
         const msg = document.createElement('div');
         msg.className = 'badge game-msg';
         Object.assign(msg.style, {
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%,-50%)',
-            fontSize: '.95rem',
-            background: 'rgba(0,0,0,.85)',
-            pointerEvents: 'auto',
-            textAlign: 'center',
-            padding: '14px 22px',
-            borderRadius: '14px'
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%,-50%)', fontSize: '.95rem',
+            background: 'rgba(0,0,0,.85)', pointerEvents: 'auto',
+            textAlign: 'center', padding: '14px 22px', borderRadius: '14px'
         });
         msg.innerHTML = html;
         wrap.appendChild(msg);
-        window.startAgain = e => {
-            e.preventDefault();
-            msg.remove();
-            startGame();
-        };
+        window.startAgain = e => { e.preventDefault(); msg.remove(); startGame(); };
     }
 
-    /* Audio Functions */
     function ensureAudio() {
         if (actx) return;
         actx = new (window.AudioContext || window.webkitAudioContext)();
@@ -525,11 +478,9 @@ document.getElementById('year').textContent = new Date().getFullYear();
             ensureAudio();
             if (actx?.state === 'suspended') actx.resume();
             stopSpray();
-
             const buffer = actx.createBuffer(1, actx.sampleRate, actx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-
             noiseSrc = actx.createBufferSource();
             noiseSrc.buffer = buffer;
             const filt = actx.createBiquadFilter();
@@ -551,43 +502,33 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
     function playPop() {
         if (!actx) return;
-        const o = actx.createOscillator();
-        const g = actx.createGain();
+        const o = actx.createOscillator(), g = actx.createGain();
         o.type = 'sine';
         o.frequency.setValueAtTime(450, actx.currentTime);
         o.frequency.exponentialRampToValueAtTime(90, actx.currentTime + 0.1);
         g.gain.setValueAtTime(0.25, actx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.1);
-        o.connect(g);
-        g.connect(gain);
-        o.start();
-        o.stop(actx.currentTime + 0.11);
+        o.connect(g); g.connect(gain); o.start(); o.stop(actx.currentTime + 0.11);
     }
 
     function playWin() {
         if (!actx) return;
-        const o = actx.createOscillator();
-        const g = actx.createGain();
+        const o = actx.createOscillator(), g = actx.createGain();
         o.type = 'triangle';
         o.frequency.setValueAtTime(400, actx.currentTime);
         o.frequency.exponentialRampToValueAtTime(800, actx.currentTime + 0.25);
         g.gain.setValueAtTime(0.35, actx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.35);
-        o.connect(g);
-        g.connect(gain);
-        o.start();
-        o.stop(actx.currentTime + 0.4);
+        o.connect(g); g.connect(gain); o.start(); o.stop(actx.currentTime + 0.4);
     }
 
-    /* Custom Cursor */
     (function makeCursor() {
         const src = "https://i.imgur.com/ow3h5Kt.png";
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
             const s = 44, cnv = document.createElement('canvas');
-            cnv.width = s;
-            cnv.height = s;
+            cnv.width = s; cnv.height = s;
             const c = cnv.getContext('2d'), scale = Math.min(s / img.width, s / img.height);
             const w = img.width * scale, h = img.height * scale;
             c.drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
@@ -601,7 +542,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
         img.src = src;
     })();
 
-    /* Initialize Game */
     function init() {
         resize();
         spawnBacteria(6);
@@ -617,10 +557,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
     }
 
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            spraying = false;
-            stopSpray();
-        }
+        if (document.hidden) { spraying = false; stopSpray(); }
     });
 
     let rzTimer;
@@ -647,7 +584,9 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
     const i18n = {
         es: {
+            /* ---- Loader ---- */
             loaderText: 'CARGANDO...',
+            /* ---- Nav ---- */
             navWhat: '¿Qué es?',
             navBenefits: 'Beneficios',
             navPlay: 'Juego',
@@ -657,6 +596,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             mNavPlay: 'Juego',
             mNavBuy: 'Comprar',
             closeMenu: 'Cerrar',
+            /* ---- Hero ---- */
             heroBadge: 'DESENGRASANTE PROFESIONAL',
             heroTitle: 'El Poder Cítrico Para Tu <span>Parrilla</span>',
             heroDesc: 'CTX Grill Degreaser es el desengrasante biodegradable #1 para parrillas, asadores y cocinas comerciales. Fórmula profesional con aroma a toronja que elimina la grasa al instante.',
@@ -668,6 +608,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             label1: 'Eco-Friendly',
             label2: 'Poder Toronja',
             label3: 'Grado Profesional',
+            /* ---- What Is ---- */
             whatTitle: '¿Qué es CTX Grill Degreaser?',
             whatDesc: 'Un desengrasante de grado profesional diseñado específicamente para eliminar grasa, aceite y residuos de parrillas, asadores y superficies de cocina.',
             card1Title: 'Limpieza Profunda',
@@ -676,6 +617,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             card2Desc: 'Fórmula a base de toronja, segura para uso doméstico o profesional.',
             card3Title: 'Fácil de Usar',
             card3Desc: 'Rocía, espera 5–15 minutos, cepilla y enjuaga. ¡Así de simple!',
+            /* ---- Benefits ---- */
             benefitsTitle: 'Beneficios del Producto',
             benefitsDesc: 'CTX Grill Degreaser ofrece ventajas únicas que lo hacen el mejor desengrasante del mercado.',
             ben1Title: 'Fórmula Ecológica',
@@ -686,7 +628,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
             ben3Desc: 'El aroma a toronja mantiene tu cocina limpia y fresca.',
             ben4Title: 'Uso Versátil',
             ben4Desc: 'Perfecto para parrillas, sartenes, hornos, air fryers y más.',
-            usesTitle: '¿Dónde Usar CTX?',
+            /* ---- Uses ---- */
+            usesTitle: '¿Dónde Usar CTX Grill Degreaser?',
             usesDesc: 'Diseñado para múltiples superficies y aplicaciones.',
             use1: '🔥 Parrillas',
             use2: '🍳 Planchas',
@@ -696,32 +639,48 @@ document.getElementById('year').textContent = new Date().getFullYear();
             use6: '🏪 Restaurantes',
             use7: '🚚 Food Trucks',
             use8: '🥩 Asadores',
+            /* ---- FAQ ---- */
+            faqHeading: 'Preguntas Frecuentes',
+            faqDesc: 'Todo lo que necesitas saber sobre CTX Grill Degreaser.',
+            faq1Q: '¿Es seguro para superficies de cocina?',
+            faq1A: 'Sí. CTX es a base de agua, libre de COV y no tóxico — seguro para superficies en contacto con alimentos después de enjuagar.',
+            faq2Q: '¿Cómo se usa?',
+            faq2A: 'Rocía, espera 5–15 minutos, cepilla y enjuaga. El indicador de color cambia a blanco al contactar la grasa.',
+            faq3Q: '¿Dónde comprarlo?',
+            faq3A: 'Disponible en línea en <a href="https://campsite.bio/ctxshop" target="_blank" rel="noopener noreferrer" style="color:var(--acid)">campsite.bio/ctxshop</a>. Para mayoreo contacta al (832) 948-6169.',
+            /* ---- Game ---- */
             gameTitle: '🎮 ¡Prueba el Poder de CTX!',
             gameDesc: 'Usa el spray para eliminar las bacterias de la parrilla. ¡Tienes 15 segundos!',
             gameInstructions: '👆 Toca o haz clic y arrastra para rociar',
-            restartText: 'Reiniciar',
+            restartBtn: 'Reiniciar',
             scoreLabel: 'Kills',
             gameWin: '<strong>¡Misión cumplida!</strong><br>Bacterias eliminadas.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Jugar de nuevo</a>',
             gameLose: '¡Tiempo! <strong>{{score}}</strong> bacterias.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Reintentar</a>',
             gameStart: '👆 Toca para comenzar',
+            /* ---- Gallery ---- */
             galleryTitle: 'Galería de Contenido',
             galleryDesc: 'Videos con tips de uso, demostraciones y resultados.',
+            /* ---- Contact ---- */
             contactTitle: '📞 ¿Preguntas? ¡Contáctanos!',
             contactDesc: 'Estamos disponibles para pedidos, distribución y soporte técnico.',
             callLabel: 'Llamar',
             smsLabel: 'SMS',
+            /* ---- Docs ---- */
             docsTitle: 'Documentos Técnicos',
             docsDesc: 'Descarga las fichas con especificaciones y recomendaciones.',
+            /* ---- Buy ---- */
             buyTitle: '¿Listo para una Parrilla Limpia?',
             buyDesc: 'Compra CTX Grill Degreaser hoy y descubre el poder de la limpieza profesional.',
             buyCta1: 'Comprar en Línea',
             buyCta2: 'Contactar Ventas',
             contactInfo: 'Contacto:',
+            /* ---- Sticky / Footer ---- */
             stickyCta1: 'Comprar',
             stickyCta2: 'Beneficios',
             footerTagline: 'El poder cítrico para tu parrilla',
+            /* ---- Benefits Sheet ---- */
             sheetTitle: 'Beneficios de CTX',
-            sheetClose: 'Cerrar',
+            closeBeneficios: 'Cerrar',
             sheetBen1: '<strong>Limpieza profunda:</strong> Formulado para limpieza intensiva de parrillas y utensilios.',
             sheetBen2: '<strong>Fórmula ecológica:</strong> A base de agua, libre de COV y metales pesados.',
             sheetBen3: '<strong>Indicador de color:</strong> Se vuelve blanco al contacto con la grasa.',
@@ -729,7 +688,9 @@ document.getElementById('year').textContent = new Date().getFullYear();
             sheetBen5: '<strong>Uso versátil:</strong> Seguro para ti, tus superficies y el medio ambiente.',
         },
         en: {
+            /* ---- Loader ---- */
             loaderText: 'LOADING...',
+            /* ---- Nav ---- */
             navWhat: 'What is it?',
             navBenefits: 'Benefits',
             navPlay: 'Game',
@@ -739,6 +700,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             mNavPlay: 'Game',
             mNavBuy: 'Buy',
             closeMenu: 'Close',
+            /* ---- Hero ---- */
             heroBadge: 'PROFESSIONAL DEGREASER',
             heroTitle: 'The Citrus Power For Your <span>Grill</span>',
             heroDesc: 'CTX Grill Degreaser is the #1 biodegradable degreaser for grills, smokers, and commercial kitchens. Professional formula with grapefruit scent that removes grease instantly.',
@@ -750,6 +712,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             label1: 'Eco-Friendly',
             label2: 'Grapefruit Power',
             label3: 'Professional Grade',
+            /* ---- What Is ---- */
             whatTitle: 'What is CTX Grill Degreaser?',
             whatDesc: 'A professional-grade degreaser specifically designed to remove grease, oil, and food residue from grills, smokers, and kitchen surfaces.',
             card1Title: 'Deep Cleaning',
@@ -758,6 +721,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
             card2Desc: 'Grapefruit-based formula, safe for home or professional use.',
             card3Title: 'Easy to Use',
             card3Desc: 'Spray, wait 5–15 minutes, scrub and rinse. That simple!',
+            /* ---- Benefits ---- */
             benefitsTitle: 'Product Benefits',
             benefitsDesc: 'CTX Grill Degreaser offers unique advantages that make it the best degreaser on the market.',
             ben1Title: 'Eco-Friendly Formula',
@@ -768,7 +732,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
             ben3Desc: 'Grapefruit aroma keeps your kitchen clean and fresh.',
             ben4Title: 'Versatile Use',
             ben4Desc: 'Perfect for grills, pans, ovens, air fryers and more.',
-            usesTitle: 'Where to Use CTX?',
+            /* ---- Uses ---- */
+            usesTitle: 'Where to Use CTX Grill Degreaser?',
             usesDesc: 'Designed for multiple surfaces and applications.',
             use1: '🔥 Grills',
             use2: '🍳 Griddles',
@@ -778,32 +743,48 @@ document.getElementById('year').textContent = new Date().getFullYear();
             use6: '🏪 Commercial',
             use7: '🚚 Food Trucks',
             use8: '🥩 Smokers',
+            /* ---- FAQ ---- */
+            faqHeading: 'Frequently Asked Questions',
+            faqDesc: 'Everything you need to know about CTX Grill Degreaser.',
+            faq1Q: 'Is it safe for kitchen surfaces?',
+            faq1A: 'Yes. CTX is water-based, VOC-free, and non-toxic — safe for food-contact surfaces after thorough rinsing.',
+            faq2Q: 'How do you use it?',
+            faq2A: 'Spray, wait 5–15 minutes, scrub and rinse. The color-change indicator turns white on contact with grease.',
+            faq3Q: 'Where can I buy it?',
+            faq3A: 'Available online at <a href="https://campsite.bio/ctxshop" target="_blank" rel="noopener noreferrer" style="color:var(--acid)">campsite.bio/ctxshop</a>. For wholesale orders call (832) 948-6169.',
+            /* ---- Game ---- */
             gameTitle: '🎮 Try the Power of CTX!',
             gameDesc: 'Use the spray to eliminate bacteria from the grill. You have 15 seconds!',
             gameInstructions: '👆 Tap or click and drag to spray',
-            restartText: 'Restart',
+            restartBtn: 'Restart',
             scoreLabel: 'Kills',
             gameWin: '<strong>Mission accomplished!</strong><br>Bacteria eliminated.<br><a href="#" style="color:var(--acid)" onclick="window.startAgain(event)">Play again</a>',
             gameLose: "Time's up! <strong>{{score}}</strong> bacteria.<br><a href=\"#\" style=\"color:var(--acid)\" onclick=\"window.startAgain(event)\">Try again</a>",
             gameStart: '👆 Tap to start',
+            /* ---- Gallery ---- */
             galleryTitle: 'Content Gallery',
             galleryDesc: 'Videos with usage tips, demos and results.',
-            contactTitle: '📞 Questions? Contact us!',
-            contactDesc: 'We\'re available for orders, distribution and technical support.',
+            /* ---- Contact ---- */
+            contactTitle: '📞 Questions? Contact Us!',
+            contactDesc: "We're available for orders, distribution and technical support.",
             callLabel: 'Call',
             smsLabel: 'SMS',
+            /* ---- Docs ---- */
             docsTitle: 'Technical Documents',
             docsDesc: 'Download spec sheets with specifications and recommendations.',
+            /* ---- Buy ---- */
             buyTitle: 'Ready for a Clean Grill?',
             buyDesc: 'Buy CTX Grill Degreaser today and discover the power of professional cleaning.',
             buyCta1: 'Buy Online',
             buyCta2: 'Contact Sales',
             contactInfo: 'Contact:',
+            /* ---- Sticky / Footer ---- */
             stickyCta1: 'Buy',
             stickyCta2: 'Benefits',
             footerTagline: 'The citrus power for your grill',
+            /* ---- Benefits Sheet ---- */
             sheetTitle: 'CTX Benefits',
-            sheetClose: 'Close',
+            closeBeneficios: 'Close',
             sheetBen1: '<strong>Deep cleaning:</strong> Formulated for intensive cleaning of grills and utensils.',
             sheetBen2: '<strong>Eco-friendly formula:</strong> Water-based, free of VOCs and heavy metals.',
             sheetBen3: '<strong>Color indicator:</strong> Turns white on contact with grease.',
@@ -811,6 +792,20 @@ document.getElementById('year').textContent = new Date().getFullYear();
             sheetBen5: '<strong>Versatile use:</strong> Safe for you, your surfaces and the environment.',
         }
     };
+
+    /* Keys that contain HTML (use innerHTML) */
+    const HTML_KEYS = new Set([
+        'heroTitle','sheetBen1','sheetBen2','sheetBen3','sheetBen4','sheetBen5',
+        'faq1A','faq2A','faq3A',
+        'gameWin','gameLose',
+        'ben1Title','ben2Title','ben3Title','ben4Title',
+        'ben1Desc','ben2Desc','ben3Desc','ben4Desc',
+        'whatTitle','whatDesc','benefitsTitle','benefitsDesc',
+        'card1Title','card1Desc','card2Title','card2Desc','card3Title','card3Desc',
+        'contactTitle','contactDesc','galleryTitle','galleryDesc',
+        'docsTitle','docsDesc','buyTitle','buyDesc','usesTitle','usesDesc',
+        'faqHeading','faqDesc','faq1Q','faq2Q','faq3Q','sheetTitle'
+    ]);
 
     function setBtn(btn, nextLang) {
         if (!btn) return;
@@ -822,26 +817,32 @@ document.getElementById('year').textContent = new Date().getFullYear();
     function apply(lang) {
         const m = i18n[lang];
         document.documentElement.lang = lang === 'en' ? 'en-US' : 'es-ES';
-        const ids = Object.keys(m);
-        ids.forEach(id => {
+
+        Object.keys(m).forEach(id => {
             const el = $('#' + id);
-            if (el) {
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = m[id];
-                else if (id.includes('Title') || id.includes('Desc') || id.includes('Ben') || id === 'heroTitle') el.innerHTML = m[id];
-                else el.textContent = m[id];
+            if (!el) return;
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.value = m[id];
+            } else if (HTML_KEYS.has(id)) {
+                el.innerHTML = m[id];
+            } else {
+                el.textContent = m[id];
             }
         });
+
         setBtn($('#langToggle'), lang === 'es' ? 'en' : 'es');
         setBtn($('#mLangToggle'), lang === 'es' ? 'en' : 'es');
         window.__scoreLabel = m.scoreLabel;
         window.__gameStrings = {
-            winHtml: m.gameWin,
-            loseHtml: m.gameLose,
-            startHtml: '👆 ' + (lang === 'es' ? 'Toca para comenzar' : 'Tap to start')
+            winHtml:   m.gameWin,
+            loseHtml:  m.gameLose,
+            startHtml: '👆 ' + m.gameStart
         };
-        $('#score') && ($('#score').textContent = m.scoreLabel + ': ' + (window.__score || 0));
+        const scoreEl = $('#score');
+        if (scoreEl) scoreEl.textContent = m.scoreLabel + ': ' + (window.__score || 0);
     }
 
+    /* Determine initial language */
     const params = new URLSearchParams(location.search);
     let current = params.get('lang')?.startsWith('en') ? 'en' : 'es';
     try {
@@ -849,49 +850,35 @@ document.getElementById('year').textContent = new Date().getFullYear();
         if (saved === 'en' || saved === 'es') current = saved;
     } catch (e) { }
 
-    // IP-based language detection for first-time visitors
+    /* IP-based detection for first-time visitors */
     async function detectByIP() {
         try {
             const saved = localStorage.getItem('ctx-lang');
-            if (saved) return; // Don't override saved preference
+            if (saved) return;
             const resp = await fetch('https://ipapi.co/json/');
             const data = await resp.json();
-            const spanishCountries = ['MX', 'ES', 'AR', 'CO', 'PE', 'VE', 'CL', 'EC', 'GT', 'CU', 'BO', 'DO', 'HN', 'PY', 'SV', 'NI', 'CR', 'PA', 'UY', 'PR'];
-            if (spanishCountries.includes(data.country_code)) {
-                current = 'es';
-            } else {
-                current = 'en';
-            }
+            const spanishCountries = ['MX','ES','AR','CO','PE','VE','CL','EC','GT','CU','BO','DO','HN','PY','SV','NI','CR','PA','UY','PR'];
+            current = spanishCountries.includes(data.country_code) ? 'es' : 'en';
             apply(current);
         } catch (e) {
-            // Fallback to browser language
             const browserLang = navigator.language || 'en';
-            if (browserLang.startsWith('es')) current = 'es';
-            else current = 'en';
+            current = browserLang.startsWith('es') ? 'es' : 'en';
             apply(current);
         }
     }
 
-    detectByIP();
     apply(current);
+    detectByIP();
 
     function toggle() {
         current = current === 'es' ? 'en' : 'es';
         apply(current);
-        try {
-            localStorage.setItem('ctx-lang', current);
-        } catch (e) { }
+        try { localStorage.setItem('ctx-lang', current); } catch (e) { }
         const url = new URL(location.href);
         url.searchParams.set('lang', current);
         history.replaceState(null, '', url.toString());
     }
 
-    $('#langToggle')?.addEventListener('click', e => {
-        e.preventDefault();
-        toggle();
-    });
-    $('#mLangToggle')?.addEventListener('click', e => {
-        e.preventDefault();
-        toggle();
-    });
+    $('#langToggle')?.addEventListener('click', e => { e.preventDefault(); toggle(); });
+    $('#mLangToggle')?.addEventListener('click', e => { e.preventDefault(); toggle(); });
 })();
