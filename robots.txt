@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /Assets/
+
+# Point to sitemap
+Sitemap: https://www.ctxgrill.com/sitemap.xml
